@@ -905,7 +905,7 @@ export default function App({ user, profile: cloudProfile, onProfileUpdate, onSi
                       <span style={{fontSize:12,color:c.pct===1?T.green:c.pct>.6?T.amber:T.muted,fontWeight:700,fontFamily:"monospace"}}>{c.hits}/{c.total}</span>
                     </div>
                     <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:6}}>
-                      {detailPhoto&&<img src={detailPhoto} alt="" style={{width:36,height:36,borderRadius:8,objectFit:"cover",flexShrink:0}}/>}
+                      {(c.photo||c.photo_url)&&<img src={c.photo||c.photo_url} alt="" style={{width:36,height:36,borderRadius:8,objectFit:"cover",flexShrink:0}}/>}
                       <div style={{fontSize:top?19:15,fontWeight:800}}>{c.name}</div>
                     </div>
                     <div style={{display:"flex",flexWrap:"wrap",gap:5}}>
