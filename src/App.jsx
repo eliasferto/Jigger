@@ -130,7 +130,7 @@ const CRISTALERIA = [
     id: "collins",
     name: "Vaso Collins",
     emoji: "🥤",
-    photo: "https://images.unsplash.com/photo-1664297582916-7ceb3954e89a?auto=format&fit=crop&w=600&q=80",
+    photo: "https://images.unsplash.com/photo-1630071073903-423f86c14389?auto=format&fit=crop&w=600&q=80",
     aka: "Tom Collins glass",
     desc: "Similar al Highball pero más alto y estrecho. Perfecto para cócteles muy largos con mucho hielo y refresco.",
     capacidad: "300–410 ml",
