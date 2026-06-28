@@ -6,6 +6,82 @@ import { useState, useMemo, useEffect, useCallback } from "react";
 
 const ADMIN_PIN = "2025";
 
+// ── FOTOS IBA — TheCocktailDB ──
+const COCKTAIL_PHOTOS = {
+  "alexander": "https://www.thecocktaildb.com/images/media/drink/rwpsww1478252234.jpg/medium",
+  "americano": "https://www.thecocktaildb.com/images/media/drink/709s6m1613655124.jpg/medium",
+  "aviation": "https://www.thecocktaildb.com/images/media/drink/trbplb1606855233.jpg/medium",
+  "between-sheets": "https://www.thecocktaildb.com/images/media/drink/msf9wd1596273936.jpg/medium",
+  "boulevardier": "https://www.thecocktaildb.com/images/media/drink/stmew01489598908.jpg/medium",
+  "clover-club": "https://www.thecocktaildb.com/images/media/drink/7ocpjx1582560869.jpg/medium",
+  "daiquiri": "https://www.thecocktaildb.com/images/media/drink/mrz9091589574515.jpg/medium",
+  "dry-martini": "https://www.thecocktaildb.com/images/media/drink/6ck9yi1589574317.jpg/medium",
+  "gin-fizz": "https://www.thecocktaildb.com/images/media/drink/qxxqls1461705311.jpg/medium",
+  "john-collins": "https://www.thecocktaildb.com/images/media/drink/h0lqsv1587661532.jpg/medium",
+  "last-word": "https://www.thecocktaildb.com/images/media/drink/rtvuxx1472669600.jpg/medium",
+  "manhattan": "https://www.thecocktaildb.com/images/media/drink/e8xnrd1504820817.jpg/medium",
+  "negroni": "https://www.thecocktaildb.com/images/media/drink/qgdu971561574065.jpg/medium",
+  "old-fashioned": "https://www.thecocktaildb.com/images/media/drink/vrwquq1478252802.jpg/medium",
+  "rusty-nail": "https://www.thecocktaildb.com/images/media/drink/qyyvtu1468878544.jpg/medium",
+  "sazerac": "https://www.thecocktaildb.com/images/media/drink/vvmsx51612508888.jpg/medium",
+  "sidecar": "https://www.thecocktaildb.com/images/media/drink/TPQ4J61606772433.jpg/medium",
+  "tuxedo": "https://www.thecocktaildb.com/images/media/drink/rj3sbd1500659367.jpg/medium",
+  "white-lady": "https://www.thecocktaildb.com/images/media/drink/v70it21504818414.jpg/medium",
+  "aperol-spritz": "https://www.thecocktaildb.com/images/media/drink/zvsre31572902738.jpg/medium",
+  "b52": "https://www.thecocktaildb.com/images/media/drink/0103091574952052.jpg/medium",
+  "bellini": "https://www.thecocktaildb.com/images/media/drink/4ccvge1605523300.jpg/medium",
+  "black-russian": "https://www.thecocktaildb.com/images/media/drink/ck2zde1582911364.jpg/medium",
+  "bloody-mary": "https://www.thecocktaildb.com/images/media/drink/t6nagp1504883827.jpg/medium",
+  "caipirinha": "https://www.thecocktaildb.com/images/media/drink/ymnovr1604423376.jpg/medium",
+  "champagne-cocktail": "https://www.thecocktaildb.com/images/media/drink/trpxx61454514525.jpg/medium",
+  "cosmopolitan": "https://www.thecocktaildb.com/images/media/drink/kpsajh1504368362.jpg/medium",
+  "espresso-martini": "https://www.thecocktaildb.com/images/media/drink/n0sx031565360476.jpg/medium",
+  "french-75": "https://www.thecocktaildb.com/images/media/drink/fr5e8r1598719669.jpg/medium",
+  "grasshopper": "https://www.thecocktaildb.com/images/media/drink/oow53r1614945011.jpg/medium",
+  "kir": "https://www.thecocktaildb.com/images/media/drink/apwjyq1504370971.jpg/medium",
+  "lemon-drop": "https://www.thecocktaildb.com/images/media/drink/14su7y1582912097.jpg/medium",
+  "long-island": "https://www.thecocktaildb.com/images/media/drink/rrtssw1472668972.jpg/medium",
+  "mai-tai": "https://www.thecocktaildb.com/images/media/drink/kuvpuv1487587678.jpg/medium",
+  "mimosa": "https://www.thecocktaildb.com/images/media/drink/ck3inl1605783934.jpg/medium",
+  "mint-julep": "https://www.thecocktaildb.com/images/media/drink/squyyq1439907312.jpg/medium",
+  "mojito": "https://www.thecocktaildb.com/images/media/drink/metwgh1606770327.jpg/medium",
+  "moscow-mule": "https://www.thecocktaildb.com/images/media/drink/3pylxc1504370988.jpg/medium",
+  "pina-colada": "https://www.thecocktaildb.com/images/media/drink/cpf4j51504371346.jpg/medium",
+  "pisco-sour": "https://www.thecocktaildb.com/images/media/drink/quqyqp1480879103.jpg/medium",
+  "sea-breeze": "https://www.thecocktaildb.com/images/media/drink/bwouyt1439906087.jpg/medium",
+  "sex-on-beach": "https://www.thecocktaildb.com/images/media/drink/swqqqs1441252086.jpg/medium",
+  "singapore-sling": "https://www.thecocktaildb.com/images/media/drink/2i6i3a1504368679.jpg/medium",
+  "tequila-sunrise": "https://www.thecocktaildb.com/images/media/drink/quqyqp1480879103.jpg/medium",
+  "white-russian": "https://www.thecocktaildb.com/images/media/drink/vmfeaz1606770357.jpg/medium",
+  "zombie": "https://www.thecocktaildb.com/images/media/drink/xwqvur1468876267.jpg/medium",
+  "bramble": "https://www.thecocktaildb.com/images/media/drink/ybf5ls1572649485.jpg/medium",
+  "dark-stormy": "https://www.thecocktaildb.com/images/media/drink/9ycpre1571948712.jpg/medium",
+  "dirty-martini": "https://www.thecocktaildb.com/images/media/drink/36j1pg1504370802.jpg/medium",
+  "french-martini": "https://www.thecocktaildb.com/images/media/drink/3k9qic1493068931.jpg/medium",
+  "margarita": "https://www.thecocktaildb.com/images/media/drink/5noda61589575158.jpg/medium",
+  "naked-famous": "https://www.thecocktaildb.com/images/media/drink/wsyryt1473344554.jpg/medium",
+  "new-york-sour": "https://www.thecocktaildb.com/images/media/drink/hbkfsh1589574990.jpg/medium",
+  "paper-plane": "https://www.thecocktaildb.com/images/media/drink/0143mc1504368661.jpg/medium",
+  "penicillin": "https://www.thecocktaildb.com/images/media/drink/bpwzap1504366148.jpg/medium",
+  "pornstar-martini": "https://www.thecocktaildb.com/images/media/drink/xwqvur1468876267.jpg/medium",
+  "southside": "https://www.thecocktaildb.com/images/media/drink/y8a4wx1582579939.jpg/medium",
+  "vesper": "https://www.thecocktaildb.com/images/media/drink/ee3k051614944005.jpg/medium",
+  "whisky-sour": "https://www.thecocktaildb.com/images/media/drink/s4yfpp1485097755.jpg/medium",
+  "tommy-margarita": "https://www.thecocktaildb.com/images/media/drink/5noda61589575158.jpg/medium",
+  "hanky-panky": "https://www.thecocktaildb.com/images/media/drink/b5xqwk1582581359.jpg/medium",
+  "casino": "https://www.thecocktaildb.com/images/media/drink/wxc4ox1582579350.jpg/medium",
+  "vieux-carre": "https://www.thecocktaildb.com/images/media/drink/xtqpoq1606772765.jpg/medium",
+  "harvey-wallbanger": "https://www.thecocktaildb.com/images/media/drink/f1bkq01485698735.jpg/medium",
+};
+
+// Helper para obtener foto de un cóctel
+function getCocktailPhoto(c) {
+  if (c.photo) return c.photo;
+  if (c.photo_url) return c.photo_url;
+  return COCKTAIL_PHOTOS[c.id] || null;
+}
+
+
 function useStorage(key, def) {
   const [val, setVal] = useState(() => {
     try { const r = localStorage.getItem(key); return r ? JSON.parse(r) : def; } catch { return def; }
@@ -211,15 +287,31 @@ const tag = (col) => ({ background:`${col}25`, color:col, borderRadius:20, paddi
 const divider = { height:1, background:T.border, margin:"18px 0" };
 
 // ══════════════════════════════════════════════
-export default function App() {
+export default function App({ user, profile: cloudProfile, onProfileUpdate, onSignOut, supabase }) {
   const [tab, setTab] = useState("builder");
   const [detail, setDetail] = useState(null);
   const [techDetail, setTechDetail] = useState(null);
 
-  const [customs, setCustoms] = useStorage("jigger-customs-v2", []);
-  const [favs, setFavs] = useStorage("jigger-favs-v2", []);
-  const [profile, setProfile] = useStorage("jigger-profile-v2", { name:"", city:"", cert:"", bio:"", photo:"" });
+  const [customs, setCustoms] = useState([]);
+  const [favs, setFavs] = useState([]);
+  const [profile, setProfile] = useState(cloudProfile || { name:"", city:"", cert:"", bio:"", photo_url:"" });
   const [notes, setNotes] = useStorage("jigger-notes-v2", {});
+
+
+  // ── Cargar datos de la nube ──
+  useEffect(() => {
+    if (!user || !supabase) return;
+    // Sync profile
+    if (cloudProfile) setProfile(cloudProfile);
+    // Load customs from Supabase
+    supabase.from("cocktails").select("*").eq("user_id", user.id).then(({ data }) => {
+      if (data) setCustoms(data.map(c => ({ ...c, ingredients: c.ingredients || [], showMeasures: c.show_measures, photo: c.photo_url })));
+    });
+    // Load favs from Supabase
+    supabase.from("favorites").select("cocktail_id").eq("user_id", user.id).then(({ data }) => {
+      if (data) setFavs(data.map(f => f.cocktail_id));
+    });
+  }, [user, cloudProfile]);
 
   // Builder
   const [selected, setSelected] = useState([]);
@@ -260,7 +352,17 @@ export default function App() {
 
   const allDB = useMemo(() => [...IBA_DB, ...customs.map(c=>({...c,cat:"Mis Creaciones",isCustom:true}))], [customs]);
   const bases = useMemo(() => ["Todos",...new Set(IBA_DB.map(c=>c.base).sort())], []);
-  const toggleFav = (id) => { setFavs(p=>p.includes(id)?p.filter(x=>x!==id):[...p,id]); };
+  const toggleFav = async (id) => {
+    const isFaved = favs.includes(id);
+    setFavs(p => isFaved ? p.filter(x=>x!==id) : [...p, id]);
+    if (user && supabase) {
+      if (isFaved) {
+        await supabase.from("favorites").delete().eq("user_id", user.id).eq("cocktail_id", id);
+      } else {
+        await supabase.from("favorites").insert({ user_id: user.id, cocktail_id: id });
+      }
+    }
+  };
   const isFav = (id) => favs.includes(id);
 
   // Builder matches
@@ -292,10 +394,34 @@ export default function App() {
   const tryPin = () => { if(pin===ADMIN_PIN){setAdminAuth(true);setPinErr(false);setAdminTab("list");}else{setPinErr(true);setPin("");} };
   const openAdd = () => { setEditTarget(null); setForm({name:"",ingredients:"",recipe:"",showMeasures:true,method:"Shake",glass:"Cocktail",garnish:"",notes:"",photo:""}); setPhotoPreview(null); setAdminTab("form"); };
   const openEdit = (c) => { setEditTarget(c); setForm({name:c.name,ingredients:c.ingredients.join(", "),recipe:c.recipe||"",showMeasures:c.showMeasures!==false,method:c.method||"Shake",glass:c.glass||"Cocktail",garnish:c.garnish||"",notes:c.notes||"",photo:c.photo||""}); setPhotoPreview(c.photo||null); setAdminTab("form"); };
-  const saveForm = () => {
+  const saveForm = async () => {
     if(!form.name||!form.ingredients) return;
-    const entry={id:editTarget?.id||"c-"+Date.now(),name:form.name,ingredients:form.ingredients.split(",").map(s=>s.trim()).filter(Boolean),recipe:form.showMeasures?form.recipe:"",showMeasures:form.showMeasures,method:form.method,glass:form.glass,garnish:form.garnish,notes:form.notes,photo:form.photo,base:form.ingredients.split(",")[0]?.trim()};
-    if(editTarget) setCustoms(p=>p.map(c=>c.id===editTarget.id?entry:c)); else setCustoms(p=>[...p,entry]);
+    const ings = form.ingredients.split(",").map(s=>s.trim()).filter(Boolean);
+    const entry = {
+      name: form.name,
+      ingredients: ings,
+      recipe: form.showMeasures ? form.recipe : "",
+      show_measures: form.showMeasures,
+      method: form.method,
+      glass: form.glass,
+      garnish: form.garnish,
+      notes: form.notes,
+      photo_url: form.photo,
+      is_public: false,
+      user_id: user?.id,
+    };
+    if (user && supabase) {
+      if (editTarget) {
+        const { data } = await supabase.from("cocktails").update(entry).eq("id", editTarget.id).select().single();
+        if (data) setCustoms(p => p.map(c => c.id === editTarget.id ? {...data, ingredients: data.ingredients||[], showMeasures: data.show_measures, photo: data.photo_url} : c));
+      } else {
+        const { data } = await supabase.from("cocktails").insert(entry).select().single();
+        if (data) setCustoms(p => [...p, {...data, ingredients: data.ingredients||[], showMeasures: data.show_measures, photo: data.photo_url}]);
+      }
+    } else {
+      const local = {...entry, id: editTarget?.id||"c-"+Date.now(), showMeasures: entry.show_measures, photo: entry.photo_url};
+      if(editTarget) setCustoms(p=>p.map(c=>c.id===editTarget.id?local:c)); else setCustoms(p=>[...p,local]);
+    }
     showToast("✓ Guardado"); setAdminTab("list");
   };
   const handlePhoto = (e) => { const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{setPhotoPreview(ev.target.result);setForm(x=>({...x,photo:ev.target.result}));};r.readAsDataURL(f); };
@@ -334,7 +460,7 @@ export default function App() {
         </div>
 
         <div style={{flex:1,padding:"0 16px 100px",overflowY:"auto"}}>
-          {c.photo&&<img src={c.photo} alt={c.name} style={{width:"100%",borderRadius:14,marginBottom:16,maxHeight:200,objectFit:"cover"}}/>}
+          {getCocktailPhoto(c)&&<img src={getCocktailPhoto(c)} alt={c.name} style={{width:"100%",borderRadius:14,marginBottom:16,maxHeight:240,objectFit:"cover",background:"#111"}}/>}
 
           <div style={{display:"flex",gap:8,flexWrap:"wrap",marginBottom:10}}>
             <span style={tag(col)}>{CAT_LABEL[c.cat]||c.cat}</span>
@@ -531,7 +657,11 @@ export default function App() {
               <div style={{fontSize:13,color:T.muted,marginBottom:20}}>No se puede deshacer.</div>
               <div style={{display:"flex",gap:10}}>
                 <button onClick={()=>setDelConfirm(null)} style={{...btn(false),margin:0}}>Cancelar</button>
-                <button onClick={()=>{setCustoms(p=>p.filter(c=>c.id!==delConfirm));setDelConfirm(null);showToast("Borrado");}} style={{...btn(false,true),margin:0}}>Borrar</button>
+                <button onClick={async()=>{
+                  if (user && supabase) await supabase.from("cocktails").delete().eq("id", delConfirm);
+                  setCustoms(p=>p.filter(c=>c.id!==delConfirm));
+                  setDelConfirm(null);showToast("Borrado");
+                }} style={{...btn(false,true),margin:0}}>Borrar</button>
               </div>
             </div>
           </div>
@@ -546,10 +676,11 @@ export default function App() {
   const CocktailCard = ({c}) => {
     const col = CAT_COLOR[c.cat]||T.purple;
     const fav = isFav(c.id);
+    const photo = getCocktailPhoto(c);
     return (
       <div style={card(false)} onClick={()=>setDetail(c)}>
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",gap:8}}>
-          {c.photo&&<img src={c.photo} alt="" style={{width:40,height:40,borderRadius:8,objectFit:"cover",flexShrink:0}}/>}
+          {photo&&<img src={photo} alt="" style={{width:48,height:48,borderRadius:10,objectFit:"cover",flexShrink:0}}/>}
           <div style={{flex:1,minWidth:0}}>
             <div style={{fontSize:15,fontWeight:700,marginBottom:3}}>{c.name}</div>
             <div style={{fontSize:11,color:T.muted}}>{METHOD_ICON[c.method]} {c.method} · {c.ingredients.slice(0,3).join(", ")}{c.ingredients.length>3?"…":""}</div>
@@ -650,7 +781,10 @@ export default function App() {
                       </div>
                       <span style={{fontSize:12,color:c.pct===1?T.green:c.pct>.6?T.amber:T.muted,fontWeight:700,fontFamily:"monospace"}}>{c.hits}/{c.total}</span>
                     </div>
-                    <div style={{fontSize:top?19:15,fontWeight:800,marginBottom:6}}>{c.name}</div>
+                    <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:6}}>
+                      {getCocktailPhoto(c)&&<img src={getCocktailPhoto(c)} alt="" style={{width:36,height:36,borderRadius:8,objectFit:"cover",flexShrink:0}}/>}
+                      <div style={{fontSize:top?19:15,fontWeight:800}}>{c.name}</div>
+                    </div>
                     <div style={{display:"flex",flexWrap:"wrap",gap:5}}>
                       {c.ingredients.map(ing=>{
                         const hit=selected.some(s=>ing.toLowerCase().includes(s.toLowerCase())||s.toLowerCase().includes(ing.toLowerCase().split(" ").pop()));
@@ -779,6 +913,7 @@ export default function App() {
               )}
               <div style={{marginTop:20}}>
                 <button onClick={()=>{setProfileForm(profile);setEditProfile(true);}} style={btn(true)}>Editar perfil</button>
+              {onSignOut && <button onClick={onSignOut} style={{...btn(false), color:"#ff6b6b", border:"1px solid #ff444433"}}>Cerrar sesión</button>}
               </div>
             </>
           ):(
@@ -796,7 +931,15 @@ export default function App() {
               <input value={profileForm.cert} onChange={e=>setProfileForm(p=>({...p,cert:e.target.value}))} placeholder="ESCOM, IBA, AIBES…" style={{...inp,marginBottom:12}}/>
               <span style={lbl}>Bio</span>
               <textarea value={profileForm.bio} onChange={e=>setProfileForm(p=>({...p,bio:e.target.value}))} placeholder="Cuéntanos sobre ti…" style={{...inp,minHeight:80,resize:"vertical",marginBottom:16}}/>
-              <button onClick={()=>{setProfile(profileForm);setEditProfile(false);showToast("✓ Perfil guardado");}} style={btn(true)}>Guardar</button>
+              <button onClick={async()=>{
+                setProfile(profileForm);
+                setEditProfile(false);
+                showToast("✓ Perfil guardado");
+                if (user && supabase) {
+                  await supabase.from("profiles").update({ name:profileForm.name, city:profileForm.city, cert:profileForm.cert, bio:profileForm.bio }).eq("id", user.id);
+                  if (onProfileUpdate) onProfileUpdate(user.id);
+                }
+              }} style={btn(true)}>Guardar</button>
               <button onClick={()=>setEditProfile(false)} style={btn(false)}>Cancelar</button>
             </>
           )}
