@@ -6,59 +6,11 @@ import { useState, useMemo, useEffect, useCallback } from "react";
 
 const ADMIN_PIN = "2025";
 
-// ── FOTOS IBA — búsqueda dinámica en TheCocktailDB ──
-// Mapa de nombres IBA → nombre en TheCocktailDB (en inglés)
-const COCKTAIL_DB_NAMES = {
-  "alexander":"Alexander","americano":"Americano","angel-face":"Angel Face",
-  "aviation":"Aviation","between-sheets":"Between the Sheets","boulevardier":"Boulevardier",
-  "brandy-crusta":"Brandy Crusta","casino":"Casino","clover-club":"Clover Club",
-  "daiquiri":"Daiquiri","dry-martini":"Dry Martini","gin-fizz":"Gin Fizz",
-  "hanky-panky":"Hanky Panky","john-collins":"John Collins","last-word":"Last Word",
-  "manhattan":"Manhattan","mary-pickford":"Mary Pickford","monkey-gland":"Monkey Gland",
-  "negroni":"Negroni","old-fashioned":"Old Fashioned","paradise":"Paradise",
-  "planter-punch":"Planters Punch","porto-flip":"Porto Flip","rusty-nail":"Rusty Nail",
-  "sazerac":"Sazerac","sidecar":"Sidecar","stinger":"Stinger","tuxedo":"Tuxedo",
-  "vieux-carre":"Vieux Carre","white-lady":"White Lady","aperol-spritz":"Aperol Spritz",
-  "b52":"B-52 Shot","bellini":"Bellini","black-russian":"Black Russian",
-  "bloody-mary":"Bloody Mary","caipirinha":"Caipirinha","champagne-cocktail":"Champagne Cocktail",
-  "cosmopolitan":"Cosmopolitan","espresso-martini":"Espresso Martini","french-75":"French 75",
-  "golden-dream":"Golden Dream","grasshopper":"Grasshopper","harvey-wallbanger":"Harvey Wallbanger",
-  "kir":"Kir","lemon-drop":"Lemon Drop","long-island":"Long Island Tea",
-  "mai-tai":"Mai Tai","mimosa":"Mimosa","mint-julep":"Mint Julep","mojito":"Mojito",
-  "moscow-mule":"Moscow Mule","pina-colada":"Pina Colada","pisco-sour":"Pisco Sour",
-  "sea-breeze":"Sea Breeze","sex-on-beach":"Sex on the Beach","singapore-sling":"Singapore Sling",
-  "tequila-sunrise":"Tequila Sunrise","white-russian":"White Russian","zombie":"Zombie",
-  "bees-knees":"Bee's Knees","bramble":"Bramble","canchanchara":"Canchanchara",
-  "dark-stormy":"Dark and Stormy","dirty-martini":"Dirty Martini","french-martini":"French Martini",
-  "naked-famous":"Naked and Famous","new-york-sour":"New York Sour","paper-plane":"Paper Plane",
-  "penicillin":"Penicillin","pornstar-martini":"Porn Star Martini","russian-spring":"Russian Spring Punch",
-  "southside":"Southside Fizz","spritz-veneziano":"Spritz Veneziano","tommy-margarita":"Tommy's Margarita",
-  "margarita":"Margarita","vesper":"Vesper","whisky-sour":"Whisky Sour","bees-knees":"Bee's Knees",
-};
-
-// Cache de fotos ya buscadas
-const photoCache = {};
-
-// Hook para obtener foto de un cóctel
+// ── FOTOS — solo fotos subidas manualmente por admin ──
 function useCocktailPhoto(cocktail) {
-  const [photo, setPhoto] = useState(cocktail.photo || cocktail.photo_url || null);
-  useEffect(() => {
-    if (photo || cocktail.isCustom) return;
-    const name = COCKTAIL_DB_NAMES[cocktail.id];
-    if (!name) return;
-    if (photoCache[cocktail.id]) { setPhoto(photoCache[cocktail.id]); return; }
-    fetch(`https://www.thecocktaildb.com/api/json/v1/1/search.php?s=${encodeURIComponent(name)}`)
-      .then(r => r.json())
-      .then(data => {
-        if (data.drinks?.[0]?.strDrinkThumb) {
-          const url = data.drinks[0].strDrinkThumb + '/medium';
-          photoCache[cocktail.id] = url;
-          setPhoto(url);
-        }
-      }).catch(() => {});
-  }, [cocktail.id]);
-  return photo;
+  return cocktail.photo || cocktail.photo_url || null;
 }
+
 function useStorage(key, def) {
   const [val, setVal] = useState(() => {
     try { const r = localStorage.getItem(key); return r ? JSON.parse(r) : def; } catch { return def; }
@@ -110,6 +62,121 @@ const GLASS_NAME = {
 };
 const METHODS = ["Shake","Stir","Build","Muddle","Blend","Layer","Dry Shake"];
 const GLASSES = ["Cocktail","Highball","Old Fashioned","Collins","Champagne flute","Shot","Wine","Copper mug","Julep","Poco Grande","Otro"];
+
+
+// ── CRISTALERÍA ──
+const CRISTALERIA = [
+  {
+    id: "copa-cocktail",
+    name: "Copa Cocktail",
+    emoji: "🍸",
+    aka: "Copa Martini",
+    desc: "La copa más icónica de la coctelería. Forma de V invertida con tallo largo. Mantiene el cóctel frío sin necesidad de hielo y permite apreciar el color y aroma.",
+    capacidad: "90–150 ml",
+    uso: "Cócteles servidos 'up' — sin hielo, colados y fríos.",
+    cocktails: ["Dry Martini", "Manhattan", "Cosmopolitan", "Aviation", "Daiquiri", "Sidecar", "White Lady", "Vesper", "Last Word"],
+    tip: "Enfría siempre la copa antes de servir. Llénala con agua fría o hielo durante 2 minutos, descarta y sirve."
+  },
+  {
+    id: "copa-coupe",
+    name: "Copa Coupe",
+    emoji: "🥂",
+    aka: "Copa Champagne clásica",
+    desc: "Copa redonda y ancha con tallo largo. Elegante y vintage. Originalmente para Champagne, hoy es la favorita de los bartenders modernos para cócteles clásicos.",
+    capacidad: "120–180 ml",
+    uso: "Cócteles clásicos servidos 'up'. Alternativa elegante a la copa Martini.",
+    cocktails: ["Daiquiri", "Clover Club", "Bee's Knees", "French 75", "Champagne Cocktail", "Pisco Sour"],
+    tip: "Es la copa más fotogénica. Si tienes dudas entre Martini y Coupe para presentación, elige la Coupe."
+  },
+  {
+    id: "highball",
+    name: "Vaso Highball",
+    emoji: "🥤",
+    aka: "Vaso largo",
+    desc: "Vaso alto y estrecho. El más versátil de la coctelería. Diseñado para cócteles largos con mucho refresco sobre hielo.",
+    capacidad: "240–350 ml",
+    uso: "Cócteles largos con soda, ginger beer, tónica o zumos.",
+    cocktails: ["Mojito", "Gin Tonic", "Moscow Mule", "Aperol Spritz", "Tequila Sunrise", "Bloody Mary", "Singapore Sling"],
+    tip: "Llena siempre de hielo hasta arriba antes de montar el cóctel. El hielo abundante mantiene la temperatura y la carbonatación."
+  },
+  {
+    id: "old-fashioned",
+    name: "Vaso Old Fashioned",
+    emoji: "🥃",
+    aka: "Rocks glass / Lowball",
+    desc: "Vaso bajo y ancho. Sólido y elegante. El clásico para espirituosos puros y cócteles potentes con poco hielo o una bola de hielo grande.",
+    capacidad: "180–300 ml",
+    uso: "Espirituosos solos, cócteles cortos y potentes, cócteles 'on the rocks'.",
+    cocktails: ["Old Fashioned", "Negroni", "Whisky Sour", "Sazerac", "Boulevardier", "Caipirinha", "Mezcal Negroni"],
+    tip: "Una bola de hielo grande en este vaso es la presentación más profesional. Derrite más lento que los cubitos y queda espectacular."
+  },
+  {
+    id: "flauta",
+    name: "Flauta de Champagne",
+    emoji: "🥂",
+    aka: "Champagne flute",
+    desc: "Copa alta y estrecha que preserva las burbujas durante más tiempo. El cuello estrecho concentra los aromas y mantiene la efervescencia.",
+    capacidad: "150–200 ml",
+    uso: "Champagne, Cava, Prosecco y cócteles espumosos.",
+    cocktails: ["Bellini", "Mimosa", "Kir Royal", "French 75", "Champagne Cocktail", "Spritz Veneziano"],
+    tip: "Nunca agites ni remuevas una flauta — el gas se escapa. Vierte siempre inclinando la copa para preservar las burbujas."
+  },
+  {
+    id: "collins",
+    name: "Vaso Collins",
+    emoji: "🥤",
+    aka: "Tom Collins glass",
+    desc: "Similar al Highball pero más alto y estrecho. Perfecto para cócteles muy largos con mucho hielo y refresco.",
+    capacidad: "300–410 ml",
+    uso: "Collins, Fizzes y cócteles muy largos.",
+    cocktails: ["Tom Collins", "John Collins", "Gin Fizz", "Sloe Gin Fizz", "Long Island Iced Tea"],
+    tip: "La diferencia con el Highball es sutil. Si no tienes Collins, usa el Highball — nadie lo notará."
+  },
+  {
+    id: "copa-vino",
+    name: "Copa de Vino",
+    emoji: "🍷",
+    aka: "Wine glass",
+    desc: "Copa amplia con tallo largo. En coctelería se usa principalmente para spritzes y cócteles con vino.",
+    capacidad: "200–400 ml",
+    uso: "Spritzes, cócteles con vino, Sangria.",
+    cocktails: ["Aperol Spritz", "Spritz Veneziano", "Kir", "Wine Cocktails"],
+    tip: "Para el Aperol Spritz: copa grande con hielo, Prosecco primero, luego Aperol, soda al final."
+  },
+  {
+    id: "shot",
+    name: "Chupito / Shot",
+    emoji: "🥃",
+    aka: "Shot glass",
+    desc: "Vaso pequeño para una sola toma. En coctelería profesional también se usa como medidor.",
+    capacidad: "30–60 ml",
+    uso: "Shots, chupitos, layered drinks.",
+    cocktails: ["B52", "Tequila Shot", "Jäger Bomb"],
+    tip: "En muchos bares profesionales el shot glass es el jigger. Un shot estándar son 4.5 cl."
+  },
+  {
+    id: "copper-mug",
+    name: "Taza de Cobre",
+    emoji: "🍺",
+    aka: "Copper mug / Moscow Mule mug",
+    desc: "Taza de cobre que mantiene el frío de forma excepcional. Icónica e inseparable del Moscow Mule. El cobre se enfría con el hielo y mantiene el cóctel helado.",
+    capacidad: "350–500 ml",
+    uso: "Moscow Mule y variantes (Dark 'n' Stormy, Mezcal Mule).",
+    cocktails: ["Moscow Mule", "Dark 'n' Stormy", "Mezcal Mule", "Kentucky Mule"],
+    tip: "El cobre real mejora el sabor del ginger beer. Asegúrate de que sea cobre interior, no solo exterior."
+  },
+  {
+    id: "poco-grande",
+    name: "Vaso Poco Grande",
+    emoji: "🍹",
+    aka: "Hurricane glass",
+    desc: "Vaso curvilíneo tipo hurricane o poco grande. Evoca bebidas tropicales y tiki culture. Su forma amplia permite decoraciones elaboradas.",
+    capacidad: "350–500 ml",
+    uso: "Cócteles tropicales, frozen drinks, tiki cocktails.",
+    cocktails: ["Piña Colada", "Zombie", "Hurricane", "Blue Lagoon", "Sex on the Beach"],
+    tip: "Decora con abundancia — rodaja de piña, cereza, sombrilla. En un tropical, la presentación es parte de la experiencia."
+  },
+];
 
 // ── IBA DATABASE — 77 cócteles ──
 const IBA_DB = [
@@ -276,7 +343,15 @@ const divider = { height:1, background:T.border, margin:"18px 0" };
 
 // ══════════════════════════════════════════════
 export default function App({ user, profile: cloudProfile, onProfileUpdate, onSignOut, supabase }) {
+  // ── TEMA ──
+  const [themeMode, setThemeMode] = useStorage("jigger-theme", "auto");
+  const T = useMemo(() => {
+    if (themeMode === "auto") return getAutoTheme() === "light" ? LIGHT_THEME : DARK_THEME;
+    return themeMode === "light" ? LIGHT_THEME : DARK_THEME;
+  }, [themeMode]);
+
   const [tab, setTab] = useState("builder");
+  const [cristalDetail, setCristalDetail] = useState(null);
   const [detail, setDetail] = useState(null);
   const [techDetail, setTechDetail] = useState(null);
 
@@ -517,6 +592,40 @@ export default function App({ user, profile: cloudProfile, onProfileUpdate, onSi
   }
 
   // ═══════════════════════════════════
+  // CRISTALERÍA DETAIL
+  // ═══════════════════════════════════
+  if (cristalDetail) {
+    const cr = cristalDetail;
+    return (
+      <div style={{minHeight:"100vh",background:T.bg,color:T.text,fontFamily:"'Inter',system-ui,sans-serif",maxWidth:480,margin:"0 auto"}}>
+        <div style={{padding:"16px 16px 0",position:"sticky",top:0,background:T.bg}}>
+          <button onClick={()=>setCristalDetail(null)} style={{background:"none",border:"none",color:T.dim,cursor:"pointer",fontSize:14,padding:0,paddingBottom:14}}>← Volver</button>
+        </div>
+        <div style={{padding:"0 16px 80px"}}>
+          <div style={{fontSize:60,marginBottom:12,textAlign:"center"}}>{cr.emoji}</div>
+          <div style={{fontSize:26,fontWeight:900,marginBottom:2,textAlign:"center"}}>{cr.name}</div>
+          <div style={{fontSize:13,color:T.muted,textAlign:"center",marginBottom:6}}>{cr.aka}</div>
+          <div style={{...tag(T.purple),display:"block",textAlign:"center",width:"fit-content",margin:"0 auto 20px"}}>{cr.capacidad}</div>
+
+          <span style={lbl}>Descripción</span>
+          <p style={{fontSize:14,color:T.muted,lineHeight:1.8,marginBottom:20}}>{cr.desc}</p>
+
+          <span style={lbl}>Cuándo usarla</span>
+          <div style={{background:T.surface,border:`1px solid ${T.border2}`,borderRadius:12,padding:"14px 16px",fontSize:13,color:T.text,lineHeight:1.7,marginBottom:20}}>{cr.uso}</div>
+
+          <span style={lbl}>Cócteles clásicos en esta copa</span>
+          <div style={{display:"flex",flexWrap:"wrap",gap:8,marginBottom:20}}>
+            {cr.cocktails.map(c=><span key={c} style={{background:T.surface,border:`1px solid ${T.border2}`,borderRadius:20,padding:"5px 13px",fontSize:12,color:T.text}}>{c}</span>)}
+          </div>
+
+          <span style={lbl}>Consejo pro</span>
+          <div style={{background:`${T.purple}12`,border:`1px solid ${T.purple}33`,borderRadius:12,padding:"14px 16px",fontSize:13,color:T.purple,lineHeight:1.7}}>💡 {cr.tip}</div>
+        </div>
+      </div>
+    );
+  }
+
+  // ═══════════════════════════════════
   // TÉCNICA DETAIL
   // ═══════════════════════════════════
   if (techDetail) {
@@ -706,7 +815,12 @@ export default function App({ user, profile: cloudProfile, onProfileUpdate, onSi
             <span style={{fontSize:18,fontWeight:900,letterSpacing:3,color:"#fff",fontVariant:"small-caps"}}>JIGGER</span>
             <span style={{fontSize:8,color:"#1e1e38",letterSpacing:2,marginLeft:10,textTransform:"uppercase"}}>Bartender Community</span>
           </div>
-          <button onClick={()=>{setAdminOpen(true);setPin("");setPinErr(false);}} style={{background:"none",border:`1px solid ${T.border}`,borderRadius:8,padding:"5px 10px",color:"#2a2a40",fontSize:11,cursor:"pointer"}}>⚙️</button>
+          <div style={{display:"flex",gap:8}}>
+            <button onClick={()=>setThemeMode(m => m==="dark"?"light":m==="light"?"auto":"dark")} style={{background:"none",border:`1px solid ${T.border}`,borderRadius:8,padding:"5px 10px",color:T.dim,fontSize:13,cursor:"pointer"}}>
+              {themeMode==="dark"?"🌙":themeMode==="light"?"☀️":"🌓"}
+            </button>
+            <button onClick={()=>{setAdminOpen(true);setPin("");setPinErr(false);}} style={{background:"none",border:`1px solid ${T.border}`,borderRadius:8,padding:"5px 10px",color:T.dim,fontSize:11,cursor:"pointer"}}>⚙️</button>
+          </div>
         </div>
       </div>
 
@@ -855,6 +969,27 @@ export default function App({ user, profile: cloudProfile, onProfileUpdate, onSi
         </div>
       )}
 
+      {/* ─── CRISTALERÍA ─── */}
+      {tab==="cristaleria"&&(
+        <div style={{flex:1,padding:"0 16px 100px",overflowY:"auto"}}>
+          <div style={{fontSize:20,fontWeight:900,marginBottom:4}}>Cristalería</div>
+          <div style={{fontSize:13,color:T.muted,marginBottom:20}}>Las copas y vasos de la coctelería clásica.</div>
+          {CRISTALERIA.map(cr=>(
+            <div key={cr.id} style={{...card(false),borderLeft:`3px solid ${T.purple}`}} onClick={()=>setCristalDetail(cr)}>
+              <div style={{display:"flex",alignItems:"center",gap:14}}>
+                <div style={{fontSize:32,flexShrink:0}}>{cr.emoji}</div>
+                <div style={{flex:1}}>
+                  <div style={{fontSize:15,fontWeight:800,marginBottom:2}}>{cr.name}</div>
+                  <div style={{fontSize:11,color:T.muted}}>{cr.aka} · {cr.capacidad}</div>
+                  <div style={{fontSize:11,color:T.dim,marginTop:4}}>{cr.cocktails.slice(0,3).join(", ")}{cr.cocktails.length>3?"…":""}</div>
+                </div>
+                <span style={{color:T.dim,fontSize:18}}>›</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
       {/* ─── GLOSARIO ─── */}
       {tab==="glosario"&&(
         <div style={{flex:1,padding:"0 16px 100px",overflowY:"auto"}}>
@@ -940,7 +1075,7 @@ export default function App({ user, profile: cloudProfile, onProfileUpdate, onSi
 
       {/* ─── NAV ─── */}
       <div style={{position:"fixed",bottom:0,left:"50%",transform:"translateX(-50%)",width:"100%",maxWidth:480,background:T.surface,borderTop:`1px solid ${T.border}`,display:"flex",zIndex:20}}>
-        {[["builder","🔍","Buscar"],["library","📖","Biblioteca"],["tecnicas","🍸","Técnicas"],["glosario","📝","Glosario"],["perfil","👤","Perfil"]].map(([t,icon,label])=>(
+        {[["builder","🔍","Buscar"],["library","📖","Biblioteca"],["tecnicas","🍸","Técnicas"],["cristaleria","🥂","Copas"],["glosario","📝","Glosario"],["perfil","👤","Perfil"]].map(([t,icon,label])=>(
           <button key={t} onClick={()=>setTab(t)} style={{flex:1,padding:"10px 2px 14px",background:"none",border:"none",borderTop:`2px solid ${tab===t?T.purpleL:"transparent"}`,color:tab===t?T.purpleL:"#2e2e50",fontSize:9,fontWeight:700,cursor:"pointer",letterSpacing:.5,textTransform:"uppercase",display:"flex",flexDirection:"column",alignItems:"center",gap:3,transition:"color .15s"}}>
             <span style={{fontSize:20}}>{icon}</span>{label}
           </button>
