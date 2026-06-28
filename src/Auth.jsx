@@ -21,6 +21,7 @@ export default function Auth({ onAuth }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [showPass, setShowPass] = useState(false);
 
   const handleLogin = async () => {
     if (!email || !password) { setError("Rellena email y contraseña"); return; }
@@ -76,7 +77,12 @@ export default function Auth({ onAuth }) {
         <div style={{ fontSize:10, letterSpacing:2, color:T.dim, textTransform:"uppercase", marginBottom:6 }}>Email *</div>
         <input type="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="tu@email.com" style={{...inp, marginBottom:12}} />
         <div style={{ fontSize:10, letterSpacing:2, color:T.dim, textTransform:"uppercase", marginBottom:6 }}>Contraseña *</div>
-        <input type="password" value={password} onChange={e=>setPassword(e.target.value)} onKeyDown={e=>e.key==="Enter"&&(mode==="login"?handleLogin():handleRegister())} placeholder={mode==="register"?"Mínimo 6 caracteres":"Tu contraseña"} style={{...inp, marginBottom:16}} />
+        <div style={{position:"relative", marginBottom:16}}>
+          <input type={showPass?"text":"password"} value={password} onChange={e=>setPassword(e.target.value)} onKeyDown={e=>e.key==="Enter"&&(mode==="login"?handleLogin():handleRegister())} placeholder={mode==="register"?"Mínimo 6 caracteres":"Tu contraseña"} style={{...inp, paddingRight:44}} />
+          <button onClick={()=>setShowPass(p=>!p)} style={{position:"absolute", right:12, top:"50%", transform:"translateY(-50%)", background:"none", border:"none", cursor:"pointer", fontSize:18, color:T.dim, padding:4}}>
+            {showPass ? "🙈" : "👁️"}
+          </button>
+        </div>
 
         {error && <div style={{ background:"#1a0808", border:"1px solid #ff444433", borderRadius:10, padding:"10px 14px", color:T.red, fontSize:13, marginBottom:12 }}>{error}</div>}
         {success && <div style={{ background:"#0a1a0a", border:"1px solid #4ade8033", borderRadius:10, padding:"10px 14px", color:T.green, fontSize:13, marginBottom:12 }}>{success}</div>}

@@ -6,82 +6,59 @@ import { useState, useMemo, useEffect, useCallback } from "react";
 
 const ADMIN_PIN = "2025";
 
-// ── FOTOS IBA — TheCocktailDB ──
-const COCKTAIL_PHOTOS = {
-  "alexander": "https://www.thecocktaildb.com/images/media/drink/rwpsww1478252234.jpg/medium",
-  "americano": "https://www.thecocktaildb.com/images/media/drink/709s6m1613655124.jpg/medium",
-  "aviation": "https://www.thecocktaildb.com/images/media/drink/trbplb1606855233.jpg/medium",
-  "between-sheets": "https://www.thecocktaildb.com/images/media/drink/msf9wd1596273936.jpg/medium",
-  "boulevardier": "https://www.thecocktaildb.com/images/media/drink/stmew01489598908.jpg/medium",
-  "clover-club": "https://www.thecocktaildb.com/images/media/drink/7ocpjx1582560869.jpg/medium",
-  "daiquiri": "https://www.thecocktaildb.com/images/media/drink/mrz9091589574515.jpg/medium",
-  "dry-martini": "https://www.thecocktaildb.com/images/media/drink/6ck9yi1589574317.jpg/medium",
-  "gin-fizz": "https://www.thecocktaildb.com/images/media/drink/qxxqls1461705311.jpg/medium",
-  "john-collins": "https://www.thecocktaildb.com/images/media/drink/h0lqsv1587661532.jpg/medium",
-  "last-word": "https://www.thecocktaildb.com/images/media/drink/rtvuxx1472669600.jpg/medium",
-  "manhattan": "https://www.thecocktaildb.com/images/media/drink/e8xnrd1504820817.jpg/medium",
-  "negroni": "https://www.thecocktaildb.com/images/media/drink/qgdu971561574065.jpg/medium",
-  "old-fashioned": "https://www.thecocktaildb.com/images/media/drink/vrwquq1478252802.jpg/medium",
-  "rusty-nail": "https://www.thecocktaildb.com/images/media/drink/qyyvtu1468878544.jpg/medium",
-  "sazerac": "https://www.thecocktaildb.com/images/media/drink/vvmsx51612508888.jpg/medium",
-  "sidecar": "https://www.thecocktaildb.com/images/media/drink/TPQ4J61606772433.jpg/medium",
-  "tuxedo": "https://www.thecocktaildb.com/images/media/drink/rj3sbd1500659367.jpg/medium",
-  "white-lady": "https://www.thecocktaildb.com/images/media/drink/v70it21504818414.jpg/medium",
-  "aperol-spritz": "https://www.thecocktaildb.com/images/media/drink/zvsre31572902738.jpg/medium",
-  "b52": "https://www.thecocktaildb.com/images/media/drink/0103091574952052.jpg/medium",
-  "bellini": "https://www.thecocktaildb.com/images/media/drink/4ccvge1605523300.jpg/medium",
-  "black-russian": "https://www.thecocktaildb.com/images/media/drink/ck2zde1582911364.jpg/medium",
-  "bloody-mary": "https://www.thecocktaildb.com/images/media/drink/t6nagp1504883827.jpg/medium",
-  "caipirinha": "https://www.thecocktaildb.com/images/media/drink/ymnovr1604423376.jpg/medium",
-  "champagne-cocktail": "https://www.thecocktaildb.com/images/media/drink/trpxx61454514525.jpg/medium",
-  "cosmopolitan": "https://www.thecocktaildb.com/images/media/drink/kpsajh1504368362.jpg/medium",
-  "espresso-martini": "https://www.thecocktaildb.com/images/media/drink/n0sx031565360476.jpg/medium",
-  "french-75": "https://www.thecocktaildb.com/images/media/drink/fr5e8r1598719669.jpg/medium",
-  "grasshopper": "https://www.thecocktaildb.com/images/media/drink/oow53r1614945011.jpg/medium",
-  "kir": "https://www.thecocktaildb.com/images/media/drink/apwjyq1504370971.jpg/medium",
-  "lemon-drop": "https://www.thecocktaildb.com/images/media/drink/14su7y1582912097.jpg/medium",
-  "long-island": "https://www.thecocktaildb.com/images/media/drink/rrtssw1472668972.jpg/medium",
-  "mai-tai": "https://www.thecocktaildb.com/images/media/drink/kuvpuv1487587678.jpg/medium",
-  "mimosa": "https://www.thecocktaildb.com/images/media/drink/ck3inl1605783934.jpg/medium",
-  "mint-julep": "https://www.thecocktaildb.com/images/media/drink/squyyq1439907312.jpg/medium",
-  "mojito": "https://www.thecocktaildb.com/images/media/drink/metwgh1606770327.jpg/medium",
-  "moscow-mule": "https://www.thecocktaildb.com/images/media/drink/3pylxc1504370988.jpg/medium",
-  "pina-colada": "https://www.thecocktaildb.com/images/media/drink/cpf4j51504371346.jpg/medium",
-  "pisco-sour": "https://www.thecocktaildb.com/images/media/drink/quqyqp1480879103.jpg/medium",
-  "sea-breeze": "https://www.thecocktaildb.com/images/media/drink/bwouyt1439906087.jpg/medium",
-  "sex-on-beach": "https://www.thecocktaildb.com/images/media/drink/swqqqs1441252086.jpg/medium",
-  "singapore-sling": "https://www.thecocktaildb.com/images/media/drink/2i6i3a1504368679.jpg/medium",
-  "tequila-sunrise": "https://www.thecocktaildb.com/images/media/drink/quqyqp1480879103.jpg/medium",
-  "white-russian": "https://www.thecocktaildb.com/images/media/drink/vmfeaz1606770357.jpg/medium",
-  "zombie": "https://www.thecocktaildb.com/images/media/drink/xwqvur1468876267.jpg/medium",
-  "bramble": "https://www.thecocktaildb.com/images/media/drink/ybf5ls1572649485.jpg/medium",
-  "dark-stormy": "https://www.thecocktaildb.com/images/media/drink/9ycpre1571948712.jpg/medium",
-  "dirty-martini": "https://www.thecocktaildb.com/images/media/drink/36j1pg1504370802.jpg/medium",
-  "french-martini": "https://www.thecocktaildb.com/images/media/drink/3k9qic1493068931.jpg/medium",
-  "margarita": "https://www.thecocktaildb.com/images/media/drink/5noda61589575158.jpg/medium",
-  "naked-famous": "https://www.thecocktaildb.com/images/media/drink/wsyryt1473344554.jpg/medium",
-  "new-york-sour": "https://www.thecocktaildb.com/images/media/drink/hbkfsh1589574990.jpg/medium",
-  "paper-plane": "https://www.thecocktaildb.com/images/media/drink/0143mc1504368661.jpg/medium",
-  "penicillin": "https://www.thecocktaildb.com/images/media/drink/bpwzap1504366148.jpg/medium",
-  "pornstar-martini": "https://www.thecocktaildb.com/images/media/drink/xwqvur1468876267.jpg/medium",
-  "southside": "https://www.thecocktaildb.com/images/media/drink/y8a4wx1582579939.jpg/medium",
-  "vesper": "https://www.thecocktaildb.com/images/media/drink/ee3k051614944005.jpg/medium",
-  "whisky-sour": "https://www.thecocktaildb.com/images/media/drink/s4yfpp1485097755.jpg/medium",
-  "tommy-margarita": "https://www.thecocktaildb.com/images/media/drink/5noda61589575158.jpg/medium",
-  "hanky-panky": "https://www.thecocktaildb.com/images/media/drink/b5xqwk1582581359.jpg/medium",
-  "casino": "https://www.thecocktaildb.com/images/media/drink/wxc4ox1582579350.jpg/medium",
-  "vieux-carre": "https://www.thecocktaildb.com/images/media/drink/xtqpoq1606772765.jpg/medium",
-  "harvey-wallbanger": "https://www.thecocktaildb.com/images/media/drink/f1bkq01485698735.jpg/medium",
+// ── FOTOS IBA — búsqueda dinámica en TheCocktailDB ──
+// Mapa de nombres IBA → nombre en TheCocktailDB (en inglés)
+const COCKTAIL_DB_NAMES = {
+  "alexander":"Alexander","americano":"Americano","angel-face":"Angel Face",
+  "aviation":"Aviation","between-sheets":"Between the Sheets","boulevardier":"Boulevardier",
+  "brandy-crusta":"Brandy Crusta","casino":"Casino","clover-club":"Clover Club",
+  "daiquiri":"Daiquiri","dry-martini":"Dry Martini","gin-fizz":"Gin Fizz",
+  "hanky-panky":"Hanky Panky","john-collins":"John Collins","last-word":"Last Word",
+  "manhattan":"Manhattan","mary-pickford":"Mary Pickford","monkey-gland":"Monkey Gland",
+  "negroni":"Negroni","old-fashioned":"Old Fashioned","paradise":"Paradise",
+  "planter-punch":"Planters Punch","porto-flip":"Porto Flip","rusty-nail":"Rusty Nail",
+  "sazerac":"Sazerac","sidecar":"Sidecar","stinger":"Stinger","tuxedo":"Tuxedo",
+  "vieux-carre":"Vieux Carre","white-lady":"White Lady","aperol-spritz":"Aperol Spritz",
+  "b52":"B-52 Shot","bellini":"Bellini","black-russian":"Black Russian",
+  "bloody-mary":"Bloody Mary","caipirinha":"Caipirinha","champagne-cocktail":"Champagne Cocktail",
+  "cosmopolitan":"Cosmopolitan","espresso-martini":"Espresso Martini","french-75":"French 75",
+  "golden-dream":"Golden Dream","grasshopper":"Grasshopper","harvey-wallbanger":"Harvey Wallbanger",
+  "kir":"Kir","lemon-drop":"Lemon Drop","long-island":"Long Island Tea",
+  "mai-tai":"Mai Tai","mimosa":"Mimosa","mint-julep":"Mint Julep","mojito":"Mojito",
+  "moscow-mule":"Moscow Mule","pina-colada":"Pina Colada","pisco-sour":"Pisco Sour",
+  "sea-breeze":"Sea Breeze","sex-on-beach":"Sex on the Beach","singapore-sling":"Singapore Sling",
+  "tequila-sunrise":"Tequila Sunrise","white-russian":"White Russian","zombie":"Zombie",
+  "bees-knees":"Bee's Knees","bramble":"Bramble","canchanchara":"Canchanchara",
+  "dark-stormy":"Dark and Stormy","dirty-martini":"Dirty Martini","french-martini":"French Martini",
+  "naked-famous":"Naked and Famous","new-york-sour":"New York Sour","paper-plane":"Paper Plane",
+  "penicillin":"Penicillin","pornstar-martini":"Porn Star Martini","russian-spring":"Russian Spring Punch",
+  "southside":"Southside Fizz","spritz-veneziano":"Spritz Veneziano","tommy-margarita":"Tommy's Margarita",
+  "margarita":"Margarita","vesper":"Vesper","whisky-sour":"Whisky Sour","bees-knees":"Bee's Knees",
 };
 
-// Helper para obtener foto de un cóctel
-function getCocktailPhoto(c) {
-  if (c.photo) return c.photo;
-  if (c.photo_url) return c.photo_url;
-  return COCKTAIL_PHOTOS[c.id] || null;
+// Cache de fotos ya buscadas
+const photoCache = {};
+
+// Hook para obtener foto de un cóctel
+function useCocktailPhoto(cocktail) {
+  const [photo, setPhoto] = useState(cocktail.photo || cocktail.photo_url || null);
+  useEffect(() => {
+    if (photo || cocktail.isCustom) return;
+    const name = COCKTAIL_DB_NAMES[cocktail.id];
+    if (!name) return;
+    if (photoCache[cocktail.id]) { setPhoto(photoCache[cocktail.id]); return; }
+    fetch(`https://www.thecocktaildb.com/api/json/v1/1/search.php?s=${encodeURIComponent(name)}`)
+      .then(r => r.json())
+      .then(data => {
+        if (data.drinks?.[0]?.strDrinkThumb) {
+          const url = data.drinks[0].strDrinkThumb + '/medium';
+          photoCache[cocktail.id] = url;
+          setPhoto(url);
+        }
+      }).catch(() => {});
+  }, [cocktail.id]);
+  return photo;
 }
-
-
 function useStorage(key, def) {
   const [val, setVal] = useState(() => {
     try { const r = localStorage.getItem(key); return r ? JSON.parse(r) : def; } catch { return def; }
@@ -120,6 +97,17 @@ const CAT_LABEL = { "Unforgettables":"ICON", "Contemporary Classics":"CLASSIC", 
 const ABV_COLOR = { low:T.green, medium:T.amber, high:T.red };
 const ABV_LABEL = { low:"Bajo ABV", medium:"ABV Medio", high:"Alto ABV" };
 const METHOD_ICON = { Shake:"🍸", Stir:"🥄", Build:"🥃", Muddle:"🌿", Blend:"🌀", Layer:"📊", Swizzle:"🌀", "Dry Shake":"🥚" };
+const GLASS_ICON = {
+  "Cocktail":"🍸", "Highball":"🥤", "Old Fashioned":"🥃", "Collins":"🥤",
+  "Champagne flute":"🥂", "Shot":"🥃", "Wine":"🍷", "Copper mug":"🍺",
+  "Julep":"🥤", "Poco Grande":"🍹", "Otro":"🍶"
+};
+const GLASS_NAME = {
+  "Cocktail":"Copa Cocktail", "Highball":"Vaso Highball", "Old Fashioned":"Vaso Old Fashioned",
+  "Collins":"Vaso Collins", "Champagne flute":"Flauta Champagne", "Shot":"Chupito",
+  "Wine":"Copa de vino", "Copper mug":"Taza de cobre", "Julep":"Vaso Julep",
+  "Poco Grande":"Vaso Poco Grande", "Otro":"Otro"
+};
 const METHODS = ["Shake","Stir","Build","Muddle","Blend","Layer","Dry Shake"];
 const GLASSES = ["Cocktail","Highball","Old Fashioned","Collins","Champagne flute","Shot","Wine","Copper mug","Julep","Poco Grande","Otro"];
 
@@ -441,6 +429,7 @@ export default function App({ user, profile: cloudProfile, onProfileUpdate, onSi
   if (detail) {
     const c = detail;
     const col = CAT_COLOR[c.cat]||T.purple;
+    const detailPhoto = useCocktailPhoto(c);
     const fav = isFav(c.id);
     const myNote = notes[c.id]||"";
     const parsed = parseRecipe(c.recipe);
@@ -460,7 +449,7 @@ export default function App({ user, profile: cloudProfile, onProfileUpdate, onSi
         </div>
 
         <div style={{flex:1,padding:"0 16px 100px",overflowY:"auto"}}>
-          {getCocktailPhoto(c)&&<img src={getCocktailPhoto(c)} alt={c.name} style={{width:"100%",borderRadius:14,marginBottom:16,maxHeight:240,objectFit:"cover",background:"#111"}}/>}
+          {detailPhoto&&<img src={detailPhoto} alt={c.name} style={{width:"100%",borderRadius:14,marginBottom:16,maxHeight:240,objectFit:"cover",background:"#111"}}/>}
 
           <div style={{display:"flex",gap:8,flexWrap:"wrap",marginBottom:10}}>
             <span style={tag(col)}>{CAT_LABEL[c.cat]||c.cat}</span>
@@ -470,7 +459,10 @@ export default function App({ user, profile: cloudProfile, onProfileUpdate, onSi
           </div>
 
           <div style={{fontSize:26,fontWeight:900,marginBottom:2,letterSpacing:-0.5}}>{c.name}</div>
-          <div style={{fontSize:12,color:T.dim,marginBottom:20}}>{METHOD_ICON[c.method]} {c.method} · {c.glass}</div>
+          <div style={{display:"flex",gap:12,marginBottom:20,flexWrap:"wrap"}}>
+            <span style={{background:T.surface,border:`1px solid ${T.border2}`,borderRadius:20,padding:"5px 13px",fontSize:12,color:T.muted}}>{METHOD_ICON[c.method]} {c.method}</span>
+            <span style={{background:T.surface,border:`1px solid ${T.border2}`,borderRadius:20,padding:"5px 13px",fontSize:12,color:T.muted}}>{GLASS_ICON[c.glass]||"🍶"} {GLASS_NAME[c.glass]||c.glass}</span>
+          </div>
 
           <span style={lbl}>Ingredientes</span>
           <div style={{display:"flex",flexWrap:"wrap",gap:8,marginBottom:20}}>
@@ -676,7 +668,7 @@ export default function App({ user, profile: cloudProfile, onProfileUpdate, onSi
   const CocktailCard = ({c}) => {
     const col = CAT_COLOR[c.cat]||T.purple;
     const fav = isFav(c.id);
-    const photo = getCocktailPhoto(c);
+    const photo = useCocktailPhoto(c);
     return (
       <div style={card(false)} onClick={()=>setDetail(c)}>
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",gap:8}}>
@@ -782,7 +774,7 @@ export default function App({ user, profile: cloudProfile, onProfileUpdate, onSi
                       <span style={{fontSize:12,color:c.pct===1?T.green:c.pct>.6?T.amber:T.muted,fontWeight:700,fontFamily:"monospace"}}>{c.hits}/{c.total}</span>
                     </div>
                     <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:6}}>
-                      {getCocktailPhoto(c)&&<img src={getCocktailPhoto(c)} alt="" style={{width:36,height:36,borderRadius:8,objectFit:"cover",flexShrink:0}}/>}
+                      {detailPhoto&&<img src={detailPhoto} alt="" style={{width:36,height:36,borderRadius:8,objectFit:"cover",flexShrink:0}}/>}
                       <div style={{fontSize:top?19:15,fontWeight:800}}>{c.name}</div>
                     </div>
                     <div style={{display:"flex",flexWrap:"wrap",gap:5}}>
