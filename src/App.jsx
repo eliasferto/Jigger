@@ -379,8 +379,54 @@ export default function App({ user, profile: cloudProfile, onProfileUpdate, onSi
   const [photos, setPhotos] = useState({});
 
   useEffect(() => {
+    // Nombres alternativos para los que no coinciden exactamente en TheCocktailDB
+    const CDB_NAME = {
+      "b52":             "B-52",
+      "dark-stormy":     "Dark n Stormy",
+      "tommy-margarita": "Tommy's Margarita",
+      "naked-famous":    "Naked and Famous",
+      "pornstar-martini":"Pornstar Martini",
+      "russian-spring":  "Russian Spring Punch",
+      "vieux-carre":     "Vieux Carré",
+      "spritz-veneziano":"Spritz Veneziano",
+      "sex-on-beach":    "Sex on the Beach",
+      "lemon-drop":      "Lemon Drop",
+      "brandy-crusta":   "Brandy Crusta",
+      "porto-flip":      "Porto Flip",
+      "hanky-panky":     "Hanky Panky",
+      "clover-club":     "Clover Club",
+      "bee-s-knees":     "Bee's Knees",
+      "bees-knees":      "Bee's Knees",
+      "john-collins":    "John Collins",
+      "mary-pickford":   "Mary Pickford",
+      "monkey-gland":    "Monkey Gland",
+      "planter-punch":   "Planter's Punch",
+      "angel-face":      "Angel Face",
+      "between-sheets":  "Between the Sheets",
+      "golden-dream":    "Golden Dream",
+      "grasshopper":     "Grasshopper",
+      "harvey-wallbanger":"Harvey Wallbanger",
+      "mint-julep":      "Mint Julep",
+      "new-york-sour":   "New York Sour",
+      "paper-plane":     "Paper Plane",
+      "french-martini":  "French Martini",
+      "dirty-martini":   "Dirty Martini",
+      "espresso-martini":"Espresso Martini",
+      "champagne-cocktail":"Champagne Cocktail",
+      "long-island":     "Long Island Tea",
+      "tequila-sunrise": "Tequila Sunrise",
+      "white-russian":   "White Russian",
+      "black-russian":   "Black Russian",
+      "mai-tai":         "Mai Tai",
+      "pina-colada":     "Pina Colada",
+      "moscow-mule":     "Moscow Mule",
+      "sea-breeze":      "Sea Breeze",
+      "aperol-spritz":   "Aperol Spritz",
+    };
+
     IBA_DB.forEach(cocktail => {
-      fetch(`https://www.thecocktaildb.com/api/json/v1/1/search.php?s=${encodeURIComponent(cocktail.name)}`)
+      const searchName = CDB_NAME[cocktail.id] || cocktail.name;
+      fetch(`https://www.thecocktaildb.com/api/json/v1/1/search.php?s=${encodeURIComponent(searchName)}`)
         .then(r => r.json())
         .then(data => {
           const url = data.drinks?.[0]?.strDrinkThumb;
