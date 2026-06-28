@@ -70,6 +70,7 @@ const CRISTALERIA = [
     id: "copa-cocktail",
     name: "Copa Cocktail",
     emoji: "🍸",
+    photo: "https://images.unsplash.com/photo-1587282863750-0a297a50b553?auto=format&fit=crop&w=600&q=80",
     aka: "Copa Martini",
     desc: "La copa más icónica de la coctelería. Forma de V invertida con tallo largo. Mantiene el cóctel frío sin necesidad de hielo y permite apreciar el color y aroma.",
     capacidad: "90–150 ml",
@@ -81,6 +82,7 @@ const CRISTALERIA = [
     id: "copa-coupe",
     name: "Copa Coupe",
     emoji: "🥂",
+    photo: "https://images.unsplash.com/photo-1691404016321-b210547c6d7a?auto=format&fit=crop&w=600&q=80",
     aka: "Copa Champagne clásica",
     desc: "Copa redonda y ancha con tallo largo. Elegante y vintage. Originalmente para Champagne, hoy es la favorita de los bartenders modernos para cócteles clásicos.",
     capacidad: "120–180 ml",
@@ -92,6 +94,7 @@ const CRISTALERIA = [
     id: "highball",
     name: "Vaso Highball",
     emoji: "🥤",
+    photo: "https://images.unsplash.com/photo-1622758665277-05e973af4395?auto=format&fit=crop&w=600&q=80",
     aka: "Vaso largo",
     desc: "Vaso alto y estrecho. El más versátil de la coctelería. Diseñado para cócteles largos con mucho refresco sobre hielo.",
     capacidad: "240–350 ml",
@@ -103,6 +106,7 @@ const CRISTALERIA = [
     id: "old-fashioned",
     name: "Vaso Old Fashioned",
     emoji: "🥃",
+    photo: "https://images.unsplash.com/photo-1615887625746-f3d2aa27e048?auto=format&fit=crop&w=600&q=80",
     aka: "Rocks glass / Lowball",
     desc: "Vaso bajo y ancho. Sólido y elegante. El clásico para espirituosos puros y cócteles potentes con poco hielo o una bola de hielo grande.",
     capacidad: "180–300 ml",
@@ -114,6 +118,7 @@ const CRISTALERIA = [
     id: "flauta",
     name: "Flauta de Champagne",
     emoji: "🥂",
+    photo: "https://images.unsplash.com/photo-1546567075-d7113bee3c4a?auto=format&fit=crop&w=600&q=80",
     aka: "Champagne flute",
     desc: "Copa alta y estrecha que preserva las burbujas durante más tiempo. El cuello estrecho concentra los aromas y mantiene la efervescencia.",
     capacidad: "150–200 ml",
@@ -125,6 +130,7 @@ const CRISTALERIA = [
     id: "collins",
     name: "Vaso Collins",
     emoji: "🥤",
+    photo: "https://images.unsplash.com/photo-1664297582916-7ceb3954e89a?auto=format&fit=crop&w=600&q=80",
     aka: "Tom Collins glass",
     desc: "Similar al Highball pero más alto y estrecho. Perfecto para cócteles muy largos con mucho hielo y refresco.",
     capacidad: "300–410 ml",
@@ -136,6 +142,7 @@ const CRISTALERIA = [
     id: "copa-vino",
     name: "Copa de Vino",
     emoji: "🍷",
+    photo: "https://images.unsplash.com/photo-1610065333275-b3e5c63fc872?auto=format&fit=crop&w=600&q=80",
     aka: "Wine glass",
     desc: "Copa amplia con tallo largo. En coctelería se usa principalmente para spritzes y cócteles con vino.",
     capacidad: "200–400 ml",
@@ -147,6 +154,7 @@ const CRISTALERIA = [
     id: "shot",
     name: "Chupito / Shot",
     emoji: "🥃",
+    photo: "https://images.unsplash.com/photo-1707340726386-611f5e9398f3?auto=format&fit=crop&w=600&q=80",
     aka: "Shot glass",
     desc: "Vaso pequeño para una sola toma. En coctelería profesional también se usa como medidor.",
     capacidad: "30–60 ml",
@@ -158,6 +166,7 @@ const CRISTALERIA = [
     id: "copper-mug",
     name: "Taza de Cobre",
     emoji: "🍺",
+    photo: "https://images.unsplash.com/photo-1527628126150-086ff233b951?auto=format&fit=crop&w=600&q=80",
     aka: "Copper mug / Moscow Mule mug",
     desc: "Taza de cobre que mantiene el frío de forma excepcional. Icónica e inseparable del Moscow Mule. El cobre se enfría con el hielo y mantiene el cóctel helado.",
     capacidad: "350–500 ml",
@@ -169,6 +178,7 @@ const CRISTALERIA = [
     id: "poco-grande",
     name: "Vaso Poco Grande",
     emoji: "🍹",
+    photo: "https://images.unsplash.com/photo-1692296979815-ba89f3ada00c?auto=format&fit=crop&w=600&q=80",
     aka: "Hurricane glass",
     desc: "Vaso curvilíneo tipo hurricane o poco grande. Evoca bebidas tropicales y tiki culture. Su forma amplia permite decoraciones elaboradas.",
     capacidad: "350–500 ml",
@@ -678,7 +688,10 @@ export default function App({ user, profile: cloudProfile, onProfileUpdate, onSi
           <button onClick={()=>setCristalDetail(null)} style={{background:"none",border:"none",color:T.dim,cursor:"pointer",fontSize:14,padding:0,paddingBottom:14}}>← Volver</button>
         </div>
         <div style={{padding:"0 16px 80px"}}>
-          <div style={{fontSize:60,marginBottom:12,textAlign:"center"}}>{cr.emoji}</div>
+          {cr.photo
+            ? <img src={cr.photo} alt={cr.name} style={{width:"100%",height:220,objectFit:"cover",borderRadius:14,marginBottom:16,background:"#111"}}/>
+            : <div style={{fontSize:60,marginBottom:12,textAlign:"center"}}>{cr.emoji}</div>
+          }
           <div style={{fontSize:26,fontWeight:900,marginBottom:2,textAlign:"center"}}>{cr.name}</div>
           <div style={{fontSize:13,color:T.muted,textAlign:"center",marginBottom:6}}>{cr.aka}</div>
           <div style={{...tag(T.purple),display:"block",textAlign:"center",width:"fit-content",margin:"0 auto 20px"}}>{cr.capacidad}</div>
@@ -1051,15 +1064,20 @@ export default function App({ user, profile: cloudProfile, onProfileUpdate, onSi
           <div style={{fontSize:20,fontWeight:900,marginBottom:4}}>Cristalería</div>
           <div style={{fontSize:13,color:T.muted,marginBottom:20}}>Las copas y vasos de la coctelería clásica.</div>
           {CRISTALERIA.map(cr=>(
-            <div key={cr.id} style={{...card(false),borderLeft:`3px solid ${T.purple}`}} onClick={()=>setCristalDetail(cr)}>
-              <div style={{display:"flex",alignItems:"center",gap:14}}>
-                <div style={{fontSize:32,flexShrink:0}}>{cr.emoji}</div>
-                <div style={{flex:1}}>
+            <div key={cr.id} style={{...card(false),padding:0,overflow:"hidden",borderLeft:`3px solid ${T.purple}`}} onClick={()=>setCristalDetail(cr)}>
+              <div style={{display:"flex",alignItems:"center",gap:0}}>
+                <div style={{width:80,height:80,flexShrink:0,overflow:"hidden",background:"#111"}}>
+                  {cr.photo
+                    ? <img src={cr.photo} alt={cr.name} style={{width:"100%",height:"100%",objectFit:"cover"}}/>
+                    : <div style={{width:"100%",height:"100%",display:"flex",alignItems:"center",justifyContent:"center",fontSize:32}}>{cr.emoji}</div>
+                  }
+                </div>
+                <div style={{flex:1,padding:"12px 14px"}}>
                   <div style={{fontSize:15,fontWeight:800,marginBottom:2}}>{cr.name}</div>
                   <div style={{fontSize:11,color:T.muted}}>{cr.aka} · {cr.capacidad}</div>
                   <div style={{fontSize:11,color:T.dim,marginTop:4}}>{cr.cocktails.slice(0,3).join(", ")}{cr.cocktails.length>3?"…":""}</div>
                 </div>
-                <span style={{color:T.dim,fontSize:18}}>›</span>
+                <span style={{color:T.dim,fontSize:18,paddingRight:14}}>›</span>
               </div>
             </div>
           ))}
