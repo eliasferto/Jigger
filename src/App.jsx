@@ -6,9 +6,9 @@ import { useState, useMemo, useEffect, useCallback } from "react";
 
 const ADMIN_PIN = "2025";
 
-// ── FOTOS — solo fotos subidas manualmente por admin ──
-function useCocktailPhoto(cocktail) {
-  return cocktail.photo || cocktail.photo_url || null;
+// ── FOTOS ──
+function useCocktailPhoto(cocktail, photoMap) {
+  return cocktail.photo || cocktail.photo_url || (photoMap && photoMap[cocktail.id]) || null;
 }
 
 function useStorage(key, def) {
@@ -376,6 +376,19 @@ export default function App({ user, profile: cloudProfile, onProfileUpdate, onSi
   const [favs, setFavs] = useState([]);
   const [profile, setProfile] = useState(cloudProfile || { name:"", city:"", cert:"", bio:"", photo_url:"" });
   const [notes, setNotes] = useStorage("jigger-notes-v2", {});
+  const [photos, setPhotos] = useState({});
+
+  useEffect(() => {
+    IBA_DB.forEach(cocktail => {
+      fetch(`https://www.thecocktaildb.com/api/json/v1/1/search.php?s=${encodeURIComponent(cocktail.name)}`)
+        .then(r => r.json())
+        .then(data => {
+          const url = data.drinks?.[0]?.strDrinkThumb;
+          if (url) setPhotos(p => ({ ...p, [cocktail.id]: url }));
+        })
+        .catch(() => {});
+    });
+  }, []);
 
 
   // ── Cargar datos de la nube ──
@@ -521,7 +534,7 @@ export default function App({ user, profile: cloudProfile, onProfileUpdate, onSi
   if (detail) {
     const c = detail;
     const col = CAT_COLOR[c.cat]||T.purple;
-    const detailPhoto = useCocktailPhoto(c);
+    const detailPhoto = useCocktailPhoto(c, photos);
     const fav = isFav(c.id);
     const myNote = notes[c.id]||"";
     const parsed = parseRecipe(c.recipe);
@@ -794,7 +807,7 @@ export default function App({ user, profile: cloudProfile, onProfileUpdate, onSi
   const CocktailCard = ({c}) => {
     const col = CAT_COLOR[c.cat]||T.purple;
     const fav = isFav(c.id);
-    const photo = useCocktailPhoto(c);
+    const photo = useCocktailPhoto(c, photos);
     return (
       <div style={card(false)} onClick={()=>setDetail(c)}>
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",gap:8}}>
