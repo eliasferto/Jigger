@@ -317,6 +317,23 @@ const GLOSARIO = [
   { term:"Expression", def:"Exprimir la piel de un cítrico (sin zumo) sobre el cóctel para liberar los aceites esenciales de la cáscara." },
 ];
 
+// ── TEMAS ──
+const DARK_THEME = {
+  bg:"#06060e", surface:"#0c0c18", card:"#0f0f1c", border:"#16162a", border2:"#1e1e38",
+  text:"#e8e3d8", muted:"#888", dim:"#444",
+  purple:"#a855f7", purpleL:"#c084fc", purpleD:"#7c3aed",
+  gold:"#f0a500", teal:"#00c9a7", red:"#ff6b6b", amber:"#fbbf24", green:"#4ade80", blue:"#60a5fa",
+};
+const LIGHT_THEME = {
+  bg:"#f5f4f0", surface:"#ffffff", card:"#ededf8", border:"#dddcee", border2:"#cccce0",
+  text:"#1a1a2e", muted:"#666", dim:"#999",
+  purple:"#7c3aed", purpleL:"#6d28d9", purpleD:"#5b21b6",
+  gold:"#d97706", teal:"#0d9488", red:"#dc2626", amber:"#d97706", green:"#16a34a", blue:"#2563eb",
+};
+function getAutoTheme() {
+  return window.matchMedia?.("(prefers-color-scheme: light)").matches ? "light" : "dark";
+}
+
 // ── HELPERS ──
 function matchScore(sel, ings) {
   const s = sel.map(x => x.toLowerCase());
