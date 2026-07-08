@@ -488,7 +488,7 @@ export default function App({ user, profile: cloudProfile, onProfileUpdate, onSi
   const [pin, setPin] = useState(""); const [pinErr, setPinErr] = useState(false);
   const [adminTab, setAdminTab] = useState("list");
   const [editTarget, setEditTarget] = useState(null);
-  const [form, setForm] = useState({ name:"", ingredients:"", recipe:"", showMeasures:true, isPublic:false, method:"Shake", glass:"Cocktail", garnish:"", notes:"", photo:"" });
+  const [form, setForm] = useState({ name:"", ingredients:"", recipe:"", showMeasures:true, isPublic:false, method:"Shake", glass:"Cocktail", garnish:"", notes:"", photo:"", difficulty:"medium", time:"", pairing:"", noAlcohol:false });
   const [photoPreview, setPhotoPreview] = useState(null);
   const [delConfirm, setDelConfirm] = useState(null);
 
@@ -795,6 +795,30 @@ export default function App({ user, profile: cloudProfile, onProfileUpdate, onSi
           <span style={lbl}>Garnish</span>
           <input value={form.garnish} onChange={e=>setForm(f=>({...f,garnish:e.target.value}))} placeholder="Twist de naranja" style={{...inp,marginBottom:14}}/>
 
+          {/* Extra fields */}
+          <div style={{display:"flex",gap:10,marginBottom:14}}>
+            <div style={{flex:1}}>
+              <span style={lbl}>Dificultad</span>
+              <select value={form.difficulty||"medium"} onChange={e=>setForm(f=>({...f,difficulty:e.target.value}))} style={inp}>
+                <option value="easy">Fácil</option>
+                <option value="medium">Medio</option>
+                <option value="advanced">Avanzado</option>
+              </select>
+            </div>
+            <div style={{flex:1}}>
+              <span style={lbl}>Tiempo aprox.</span>
+              <input value={form.time||""} onChange={e=>setForm(f=>({...f,time:e.target.value}))} placeholder="2 min" style={inp}/>
+            </div>
+          </div>
+          <span style={lbl}>Maridaje / Momento ideal</span>
+          <input value={form.pairing||""} onChange={e=>setForm(f=>({...f,pairing:e.target.value}))} placeholder="Ideal para aperitivo, mariscos…" style={{...inp,marginBottom:14}}/>
+          <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",background:T.surface,border:`1px solid ${T.border2}`,borderRadius:10,padding:"12px 14px",marginBottom:14}}>
+            <div style={{fontSize:13,fontWeight:600}}>Sin alcohol (Mocktail)</div>
+            <div onClick={()=>setForm(f=>({...f,noAlcohol:!f.noAlcohol}))} style={{width:44,height:24,background:form.noAlcohol?T.green:T.border2,borderRadius:20,cursor:"pointer",position:"relative",transition:"background .2s",flexShrink:0}}>
+              <div style={{position:"absolute",top:3,left:form.noAlcohol?22:3,width:18,height:18,background:"#fff",borderRadius:"50%",transition:"left .2s"}}/>
+            </div>
+          </div>
+
           {/* Duplicate detection */}
           {form.name && IBA_DB.some(c => c.name.toLowerCase() === form.name.toLowerCase()) && (
             <div style={{background:"#1a1200",border:"1px solid #fbbf2444",borderRadius:10,padding:"10px 14px",marginBottom:14,fontSize:13,color:T.amber}}>
@@ -911,9 +935,18 @@ export default function App({ user, profile: cloudProfile, onProfileUpdate, onSi
   // MAIN APP
   // ═══════════════════════════════════
   const appShell = { minHeight:"100vh", background:T.bg, color:T.text, fontFamily:"'Inter',system-ui,sans-serif", maxWidth:480, margin:"0 auto", display:"flex", flexDirection:"column" };
+  const globalStyle = `
+    @keyframes heartPop { 0%{transform:scale(1)} 50%{transform:scale(1.4)} 100%{transform:scale(1)} }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:none} }
+    @keyframes spin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+    * { -webkit-tap-highlight-color: transparent; }
+    ::-webkit-scrollbar { display:none; }
+    select, input, textarea { font-family: inherit; }
+  `;
 
   return (
     <div style={appShell}>
+      <style>{globalStyle}</style>
       {/* TOAST */}
       <div style={{position:"fixed",top:16,left:"50%",transform:`translateX(-50%) translateY(${toast.visible?0:-60}px)`,background:"#1a1030",border:`1px solid ${T.purpleD}55`,borderRadius:20,padding:"8px 18px",color:T.purpleL,fontSize:13,fontWeight:600,zIndex:999,transition:"transform .25s",whiteSpace:"nowrap",pointerEvents:"none"}}>
         {toast.msg}
@@ -1062,7 +1095,16 @@ export default function App({ user, profile: cloudProfile, onProfileUpdate, onSi
 
       {/* ─── COMUNIDAD ─── */}
       {tab==="community"&&(
-        <Community user={user} profile={profile} supabase={supabase} T={T} />
+        <div style={{flex:1, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", padding:"40px 24px", textAlign:"center"}}>
+          <div style={{fontSize:56, marginBottom:16}}>🌍</div>
+          <div style={{fontSize:22, fontWeight:900, marginBottom:8}}>Comunidad</div>
+          <div style={{fontSize:13, color:T.muted, lineHeight:1.7, marginBottom:24, maxWidth:280}}>
+            Pronto podrás compartir tus creaciones con otros bartenders, ver sus recetas, comentar y conectar con la comunidad.
+          </div>
+          <div style={{background:`${T.purple}15`, border:`1px solid ${T.purple}33`, borderRadius:14, padding:"14px 20px", fontSize:12, color:T.purple, fontWeight:600}}>
+            🚧 Próximamente · Chat global · Feed de creaciones · Comunidad de bartenders
+          </div>
+        </div>
       )}
 
       {/* ─── TÉCNICAS ─── */}
@@ -1127,74 +1169,148 @@ export default function App({ user, profile: cloudProfile, onProfileUpdate, onSi
 
       {/* ─── PERFIL ─── */}
       {tab==="perfil"&&(
-        <div style={{flex:1,padding:"0 16px 100px",overflowY:"auto"}}>
+        <div style={{flex:1,overflowY:"auto"}}>
           {!editProfile?(
             <>
-              <div style={{textAlign:"center",paddingTop:8,paddingBottom:20}}>
-                <div style={{width:80,height:80,borderRadius:"50%",background:"#1e1230",border:`2px solid ${T.purpleD}44`,margin:"0 auto 12px",display:"flex",alignItems:"center",justifyContent:"center",fontSize:32,overflow:"hidden"}}>
-                  {profile.photo?<img src={profile.photo} alt="" style={{width:"100%",height:"100%",objectFit:"cover"}}/>:"👤"}
+              {/* ── HERO HEADER ── */}
+              <div style={{background:`linear-gradient(160deg, ${T.purpleD}22, ${T.bg})`, padding:"28px 20px 20px", textAlign:"center", borderBottom:`1px solid ${T.border}`}}>
+                <div style={{position:"relative", width:88, height:88, margin:"0 auto 14px"}}>
+                  <div style={{width:88, height:88, borderRadius:"50%", background:`linear-gradient(135deg,${T.purpleD},${T.purple})`, padding:2}}>
+                    <div style={{width:"100%", height:"100%", borderRadius:"50%", background:T.bg, display:"flex", alignItems:"center", justifyContent:"center", fontSize:34, overflow:"hidden"}}>
+                      {profile.photo ? <img src={profile.photo} alt="" style={{width:"100%",height:"100%",objectFit:"cover"}}/> : "👤"}
+                    </div>
+                  </div>
                 </div>
-                <div style={{fontSize:22,fontWeight:900}}>{profile.name||"Tu nombre"}</div>
-                <div style={{fontSize:13,color:T.muted,marginTop:2}}>{profile.city||"Tu ciudad"}</div>
-                {profile.cert&&<div style={{...tag(T.purple),display:"inline-block",marginTop:8,fontSize:11}}>{profile.cert}</div>}
-                {profile.bio&&<div style={{fontSize:13,color:"#aaa",marginTop:12,lineHeight:1.6,maxWidth:300,margin:"12px auto 0"}}>{profile.bio}</div>}
+                <div style={{fontSize:22, fontWeight:900, letterSpacing:-0.5}}>{profile.name||"Tu nombre"}</div>
+                {profile.workplace && <div style={{fontSize:12, color:T.purple, marginTop:3, fontWeight:600}}>📍 {profile.workplace}</div>}
+                {profile.city && <div style={{fontSize:12, color:T.muted, marginTop:2}}>{profile.city}</div>}
+                {profile.cert && (
+                  <div style={{display:"inline-flex", alignItems:"center", gap:6, background:`${T.purple}20`, border:`1px solid ${T.purple}44`, borderRadius:20, padding:"4px 12px", marginTop:10}}>
+                    <span style={{fontSize:10, color:T.purple, fontWeight:700, letterSpacing:1}}>🏆 {profile.cert}</span>
+                  </div>
+                )}
+                {profile.bio && <div style={{fontSize:13, color:T.muted, marginTop:12, lineHeight:1.7, maxWidth:300, margin:"12px auto 0"}}>{profile.bio}</div>}
               </div>
-              <div style={divider}/>
-              <div style={{display:"flex",gap:10,marginBottom:20}}>
-                {[["Cócteles IBA",IBA_DB.length,T.gold],["Mis creaciones",customs.length,T.red],["Favoritos",favs.length,T.amber]].map(([l,n,c])=>(
-                  <div key={l} style={{flex:1,background:T.card,border:`1px solid ${T.border}`,borderRadius:12,padding:"12px 8px",textAlign:"center"}}>
-                    <div style={{fontSize:20,fontWeight:900,color:c}}>{n}</div>
-                    <div style={{fontSize:9,color:T.dim,letterSpacing:.5,textTransform:"uppercase",marginTop:2,lineHeight:1.3}}>{l}</div>
+
+              {/* ── STATS ── */}
+              <div style={{display:"flex", gap:0, borderBottom:`1px solid ${T.border}`}}>
+                {[["IBA",IBA_DB.length,"Clásicos",T.gold],["Creaciones",customs.length,"Propias",T.red],["Favoritos",favs.length,"Guardados",T.amber]].map(([n,v,sub,c])=>(
+                  <div key={n} style={{flex:1, padding:"16px 8px", textAlign:"center", borderRight:`1px solid ${T.border}`}}>
+                    <div style={{fontSize:22, fontWeight:900, color:c}}>{v}</div>
+                    <div style={{fontSize:10, fontWeight:700, color:T.text, marginTop:1}}>{n}</div>
+                    <div style={{fontSize:9, color:T.dim, letterSpacing:.5}}>{sub}</div>
                   </div>
                 ))}
               </div>
-              {customs.length>0&&(
-                <>
-                  <span style={lbl}>Mi carta de autor</span>
-                  {customs.map(c=><CocktailCard key={c.id} c={c}/>)}
-                </>
-              )}
-              {!customs.length&&(
-                <div style={{background:T.card,border:`1px dashed ${T.border2}`,borderRadius:14,padding:28,textAlign:"center",color:T.dim,fontSize:13,lineHeight:1.7}}>
-                  Tu carta de autor está vacía.<br/>Crea tu primer cóctel desde el Admin ⚙️
-                </div>
-              )}
-              <div style={{marginTop:20}}>
-                <button onClick={()=>{setProfileForm(profile);setEditProfile(true);}} style={btn(true)}>Editar perfil</button>
-              {onSignOut && <button onClick={onSignOut} style={{...btn(false), color:"#ff6b6b", border:"1px solid #ff444433"}}>Cerrar sesión</button>}
+
+              {/* ── TABS MIS CREACIONES / FAVORITOS ── */}
+              {(() => {
+                const [profileSubTab, setProfileSubTab] = useState("creaciones");
+                return (
+                  <div style={{padding:"0 16px 20px"}}>
+                    <div style={{display:"flex", borderBottom:`1px solid ${T.border}`, marginBottom:16, marginLeft:-16, marginRight:-16, paddingLeft:16}}>
+                      {[["creaciones","Mis Creaciones"],["favoritos","Favoritos"]].map(([t,l])=>(
+                        <button key={t} onClick={()=>setProfileSubTab(t)} style={{padding:"12px 20px", background:"none", border:"none", borderBottom:`2px solid ${profileSubTab===t?T.purple:"transparent"}`, color:profileSubTab===t?T.purple:T.dim, fontSize:13, fontWeight:profileSubTab===t?700:400, cursor:"pointer"}}>
+                          {l} {t==="creaciones"?`(${customs.length})`:`(${favs.length})`}
+                        </button>
+                      ))}
+                    </div>
+
+                    {profileSubTab==="creaciones" && (
+                      <>
+                        {!customs.length && (
+                          <div style={{background:T.card, border:`1px dashed ${T.border2}`, borderRadius:14, padding:28, textAlign:"center", color:T.dim, fontSize:13, lineHeight:1.7}}>
+                            Tu carta de autor está vacía.<br/>Crea tu primer cóctel desde ⚙️ Admin
+                          </div>
+                        )}
+                        {customs.map(c => {
+                          const fav = isFav(c.id);
+                          return (
+                            <div key={c.id} style={{background:T.card, border:`1px solid ${T.border}`, borderRadius:14, marginBottom:10, overflow:"hidden"}}>
+                              {c.photo_url && <img src={c.photo_url} alt="" style={{width:"100%", height:140, objectFit:"cover"}}/>}
+                              <div style={{padding:"14px 16px"}}>
+                                <div style={{display:"flex", justifyContent:"space-between", alignItems:"flex-start", marginBottom:8}}>
+                                  <div>
+                                    <div style={{fontSize:16, fontWeight:800}}>{c.name}</div>
+                                    <div style={{fontSize:11, color:T.muted, marginTop:2}}>{c.method} · {c.glass}</div>
+                                  </div>
+                                  <div style={{display:"flex", gap:6, alignItems:"center"}}>
+                                    <span style={{...tag(c.is_public?T.green:T.dim), fontSize:9}}>{c.is_public?"🌍 Público":"🔒 Privado"}</span>
+                                  </div>
+                                </div>
+                                <div style={{display:"flex", flexWrap:"wrap", gap:6, marginBottom:10}}>
+                                  {(c.ingredients||[]).map(i=><span key={i} style={{background:T.surface, border:`1px solid ${T.border2}`, borderRadius:20, padding:"3px 10px", fontSize:11, color:T.muted}}>{i}</span>)}
+                                </div>
+                                {c.show_measures!==false && c.recipe && <div style={{fontFamily:"monospace", fontSize:12, color:T.purple, lineHeight:1.8, marginBottom:10}}>{c.recipe}</div>}
+                                {c.show_measures===false && <div style={{fontSize:12, color:T.dim, fontStyle:"italic", marginBottom:10}}>Medidas no publicadas</div>}
+                                {c.notes && <div style={{fontSize:12, color:T.muted, lineHeight:1.6, marginBottom:10}}>{c.notes}</div>}
+                                <div style={{display:"flex", gap:8}}>
+                                  <button onClick={()=>{setAdminOpen(true);setTimeout(()=>openEdit(c),100);}} style={{flex:1, background:`${T.purple}22`, border:`1px solid ${T.purple}44`, borderRadius:10, padding:"9px", color:T.purple, fontSize:13, fontWeight:700, cursor:"pointer"}}>✏️ Editar</button>
+                                  <button onClick={()=>toggleFav(c.id)} style={{background:fav?`${T.red}22`:"none", border:`1px solid ${fav?T.red:T.border2}`, borderRadius:10, padding:"9px 14px", color:fav?T.red:T.dim, fontSize:14, cursor:"pointer"}}>{fav?"❤️":"🤍"}</button>
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </>
+                    )}
+
+                    {profileSubTab==="favoritos" && (
+                      <>
+                        {!favs.length && (
+                          <div style={{background:T.card, border:`1px dashed ${T.border2}`, borderRadius:14, padding:28, textAlign:"center", color:T.dim, fontSize:13, lineHeight:1.7}}>
+                            Aún no tienes favoritos.<br/>Toca el ❤️ en cualquier cóctel para guardarlo aquí.
+                          </div>
+                        )}
+                        {allDB.filter(c=>favs.includes(c.id)).map(c=><CocktailCard key={c.id} c={c}/>)}
+                      </>
+                    )}
+                  </div>
+                );
+              })()}
+
+              <div style={{padding:"0 16px 8px"}}>
+                <button onClick={()=>{setProfileForm({...profile});setEditProfile(true);}} style={btn(true)}>✏️ Editar perfil</button>
+                {onSignOut && <button onClick={onSignOut} style={{...btn(false), color:T.red, border:`1px solid ${T.red}33`}}>Cerrar sesión</button>}
               </div>
             </>
           ):(
             <>
-              <div style={{fontSize:16,fontWeight:800,marginBottom:20}}>Editar perfil</div>
-              <div style={{width:80,height:80,borderRadius:"50%",background:"#1e1230",border:`2px solid ${T.purpleD}44`,margin:"0 auto 16px",display:"flex",alignItems:"center",justifyContent:"center",fontSize:28,overflow:"hidden",position:"relative",cursor:"pointer"}}>
-                {profileForm.photo?<img src={profileForm.photo} alt="" style={{width:"100%",height:"100%",objectFit:"cover"}}/>:"📷"}
-                <input type="file" accept="image/*" onChange={e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>setProfileForm(p=>({...p,photo:ev.target.result}));r.readAsDataURL(f);}} style={{position:"absolute",inset:0,opacity:0,cursor:"pointer"}}/>
+              <div style={{padding:"20px 16px 0"}}>
+                <div style={{fontSize:16, fontWeight:800, marginBottom:20}}>Editar perfil</div>
+                <div style={{width:88, height:88, borderRadius:"50%", background:`linear-gradient(135deg,${T.purpleD},${T.purple})`, padding:2, margin:"0 auto 20px", position:"relative", cursor:"pointer"}}>
+                  <div style={{width:"100%", height:"100%", borderRadius:"50%", background:T.bg, display:"flex", alignItems:"center", justifyContent:"center", fontSize:28, overflow:"hidden"}}>
+                    {profileForm.photo ? <img src={profileForm.photo} alt="" style={{width:"100%",height:"100%",objectFit:"cover"}}/> : "📷"}
+                  </div>
+                  <input type="file" accept="image/*" onChange={e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>setProfileForm(p=>({...p,photo:ev.target.result}));r.readAsDataURL(f);}} style={{position:"absolute",inset:0,opacity:0,cursor:"pointer"}}/>
+                </div>
+                <span style={lbl}>Nombre</span>
+                <input value={profileForm.name||""} onChange={e=>setProfileForm(p=>({...p,name:e.target.value}))} placeholder="" style={{...inp,marginBottom:12}}/>
+                <span style={lbl}>Ciudad</span>
+                <input value={profileForm.city||""} onChange={e=>setProfileForm(p=>({...p,city:e.target.value}))} placeholder="" style={{...inp,marginBottom:12}}/>
+                <span style={lbl}>Dónde trabajas <span style={{color:T.dim,fontWeight:400,fontSize:8}}>(opcional)</span></span>
+                <input value={profileForm.workplace||""} onChange={e=>setProfileForm(p=>({...p,workplace:e.target.value}))} placeholder="" style={{...inp,marginBottom:12}}/>
+                <span style={lbl}>Certificación</span>
+                <input value={profileForm.cert||""} onChange={e=>setProfileForm(p=>({...p,cert:e.target.value}))} placeholder="" style={{...inp,marginBottom:12}}/>
+                <span style={lbl}>Bio</span>
+                <textarea value={profileForm.bio||""} onChange={e=>setProfileForm(p=>({...p,bio:e.target.value}))} placeholder="" style={{...inp,minHeight:80,resize:"vertical",marginBottom:16}}/>
+                <button onClick={async()=>{
+                  setProfile(profileForm);
+                  setEditProfile(false);
+                  showToast("✓ Perfil guardado");
+                  if (user && supabase) {
+                    await supabase.from("profiles").update({ name:profileForm.name, city:profileForm.city, cert:profileForm.cert, bio:profileForm.bio, workplace:profileForm.workplace||"" }).eq("id", user.id);
+                    if (onProfileUpdate) onProfileUpdate(user.id);
+                  }
+                }} style={btn(true)}>Guardar</button>
+                <button onClick={()=>setEditProfile(false)} style={btn(false)}>Cancelar</button>
               </div>
-              <span style={lbl}>Nombre</span>
-              <input value={profileForm.name} onChange={e=>setProfileForm(p=>({...p,name:e.target.value}))} placeholder="Tu nombre" style={{...inp,marginBottom:12}}/>
-              <span style={lbl}>Ciudad</span>
-              <input value={profileForm.city} onChange={e=>setProfileForm(p=>({...p,city:e.target.value}))} placeholder="Madrid, Barcelona…" style={{...inp,marginBottom:12}}/>
-              <span style={lbl}>Certificación</span>
-              <input value={profileForm.cert} onChange={e=>setProfileForm(p=>({...p,cert:e.target.value}))} placeholder="ESCOM, IBA, AIBES…" style={{...inp,marginBottom:12}}/>
-              <span style={lbl}>Bio</span>
-              <textarea value={profileForm.bio} onChange={e=>setProfileForm(p=>({...p,bio:e.target.value}))} placeholder="Cuéntanos sobre ti…" style={{...inp,minHeight:80,resize:"vertical",marginBottom:16}}/>
-              <button onClick={async()=>{
-                setProfile(profileForm);
-                setEditProfile(false);
-                showToast("✓ Perfil guardado");
-                if (user && supabase) {
-                  await supabase.from("profiles").update({ name:profileForm.name, city:profileForm.city, cert:profileForm.cert, bio:profileForm.bio }).eq("id", user.id);
-                  if (onProfileUpdate) onProfileUpdate(user.id);
-                }
-              }} style={btn(true)}>Guardar</button>
-              <button onClick={()=>setEditProfile(false)} style={btn(false)}>Cancelar</button>
             </>
           )}
         </div>
       )}
 
-      {/* ─── NAV ─── */}
+            {/* ─── NAV ─── */}
       <div style={{position:"fixed",bottom:0,left:"50%",transform:"translateX(-50%)",width:"100%",maxWidth:480,background:T.surface,borderTop:`1px solid ${T.border}`,display:"flex",zIndex:20}}>
         {[["builder","🔍","Buscar"],["library","📖","Biblioteca"],["community","🌍","Comunidad"],["tecnicas","🍸","Técnicas"],["cristaleria","🥂","Copas"],["perfil","👤","Perfil"]].map(([t,icon,label])=>(
           <button key={t} onClick={()=>setTab(t)} style={{flex:1,padding:"10px 2px 14px",background:"none",border:"none",borderTop:`2px solid ${tab===t?T.purpleL:"transparent"}`,color:tab===t?T.purpleL:"#2e2e50",fontSize:9,fontWeight:700,cursor:"pointer",letterSpacing:.5,textTransform:"uppercase",display:"flex",flexDirection:"column",alignItems:"center",gap:3,transition:"color .15s"}}>
