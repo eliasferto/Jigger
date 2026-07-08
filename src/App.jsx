@@ -5,7 +5,6 @@ import Community from "./Community.jsx";
 // JIGGER v2 — Bartender Community App
 // ══════════════════════════════════════════════════════════
 
-const ADMIN_PIN = "2025";
 
 // ── FOTOS ──
 function useCocktailPhoto(cocktail, photoMap) {
@@ -483,11 +482,8 @@ export default function App({ user, profile: cloudProfile, onProfileUpdate, onSi
   const [calcServings, setCalcServings] = useState(1);
 
   // Admin
-  const [adminOpen, setAdminOpen] = useState(false);
-  const [adminAuth, setAdminAuth] = useState(false);
-  const [pin, setPin] = useState(""); const [pinErr, setPinErr] = useState(false);
-  const [adminTab, setAdminTab] = useState("list");
   const [editTarget, setEditTarget] = useState(null);
+  const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({ name:"", ingredients:"", recipe:"", showMeasures:true, isPublic:false, method:"Shake", glass:"Cocktail", garnish:"", notes:"", photo:"", difficulty:"medium", time:"", pairing:"", noAlcohol:false });
   const [photoPreview, setPhotoPreview] = useState(null);
   const [delConfirm, setDelConfirm] = useState(null);
@@ -542,9 +538,8 @@ export default function App({ user, profile: cloudProfile, onProfileUpdate, onSi
   }, [ingInput, selected]);
 
   // Admin
-  const tryPin = () => { if(pin===ADMIN_PIN){setAdminAuth(true);setPinErr(false);setAdminTab("list");}else{setPinErr(true);setPin("");} };
-  const openAdd = () => { setEditTarget(null); setForm({name:"",ingredients:"",recipe:"",showMeasures:true,method:"Shake",glass:"Cocktail",garnish:"",notes:"",photo:""}); setPhotoPreview(null); setAdminTab("form"); };
-  const openEdit = (c) => { setEditTarget(c); setForm({name:c.name,ingredients:c.ingredients.join(", "),recipe:c.recipe||"",showMeasures:c.showMeasures!==false,isPublic:c.is_public||false,method:c.method||"Shake",glass:c.glass||"Cocktail",garnish:c.garnish||"",notes:c.notes||"",photo:c.photo||""}); setPhotoPreview(c.photo||null); setAdminTab("form"); };
+  const openAdd = () => { setEditTarget(null); setForm({name:"",ingredients:"",recipe:"",showMeasures:true,isPublic:false,method:"Shake",glass:"Cocktail",garnish:"",notes:"",photo:"",difficulty:"medium",time:"",pairing:"",noAlcohol:false}); setPhotoPreview(null); setShowForm(true); };
+  const openEdit = (c) => { setEditTarget(c); setForm({name:c.name,ingredients:c.ingredients.join(", "),recipe:c.recipe||"",showMeasures:c.showMeasures!==false,isPublic:c.is_public||false,method:c.method||"Shake",glass:c.glass||"Cocktail",garnish:c.garnish||"",notes:c.notes||"",photo:c.photo||"",difficulty:c.difficulty||"medium",time:c.time||"",pairing:c.pairing||"",noAlcohol:c.no_alcohol||false}); setPhotoPreview(c.photo_url||null); setShowForm(true); };
   const saveForm = async () => {
     if(!form.name||!form.ingredients) return;
     const ings = form.ingredients.split(",").map(s=>s.trim()).filter(Boolean);
@@ -573,7 +568,7 @@ export default function App({ user, profile: cloudProfile, onProfileUpdate, onSi
       const local = {...entry, id: editTarget?.id||"c-"+Date.now(), showMeasures: entry.show_measures, photo: entry.photo_url};
       if(editTarget) setCustoms(p=>p.map(c=>c.id===editTarget.id?local:c)); else setCustoms(p=>[...p,local]);
     }
-    showToast("✓ Guardado"); setAdminTab("list");
+    showToast("✓ Guardado"); setShowForm(false);
   };
   const handlePhoto = (e) => { const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{setPhotoPreview(ev.target.result);setForm(x=>({...x,photo:ev.target.result}));};r.readAsDataURL(f); };
 
@@ -606,7 +601,7 @@ export default function App({ user, profile: cloudProfile, onProfileUpdate, onSi
             <div style={{display:"flex",gap:8}}>
               <button onClick={()=>{const t=shareRecipe(c);showToast("Receta copiada");}} style={{background:T.surface,border:`1px solid ${T.border2}`,borderRadius:8,padding:"6px 10px",fontSize:13,cursor:"pointer"}}>📤 Compartir</button>
               <button onClick={()=>{toggleFav(c.id);showToast(fav?"Quitado":"❤️ Añadido a favoritos");}} style={{background:T.surface,border:`1px solid ${T.border2}`,borderRadius:8,padding:"6px 10px",fontSize:16,cursor:"pointer"}}>{fav?"❤️":"🤍"}</button>
-              {c.isCustom&&adminAuth&&<button onClick={()=>{setDetail(null);setAdminOpen(true);openEdit(c);}} style={{background:"#1e1230",border:`1px solid ${T.purpleD}44`,borderRadius:8,padding:"6px 12px",color:T.purpleL,fontSize:12,cursor:"pointer"}}>✏️</button>}
+              {c.isCustom&&<button onClick={()=>{setDetail(null);openEdit(c);}} style={{background:"#1e1230",border:`1px solid ${T.purpleD}44`,borderRadius:8,padding:"6px 12px",color:T.purpleL,fontSize:12,cursor:"pointer"}}>✏️</button>}
             </div>
           </div>
         </div>
@@ -744,195 +739,6 @@ export default function App({ user, profile: cloudProfile, onProfileUpdate, onSi
   // ═══════════════════════════════════
   // ADMIN PANEL
   // ═══════════════════════════════════
-  if (adminOpen) {
-    const appStyle = {minHeight:"100vh",background:T.bg,color:T.text,fontFamily:"'Inter',system-ui,sans-serif",maxWidth:480,margin:"0 auto"};
-
-    if (!adminAuth) return (
-      <div style={{...appStyle,display:"flex",alignItems:"center",justifyContent:"center"}}>
-        <div style={{padding:32,width:"100%",maxWidth:320}}>
-          <div style={{fontSize:40,textAlign:"center",marginBottom:8}}>🔐</div>
-          <div style={{fontSize:20,fontWeight:900,textAlign:"center",marginBottom:4}}>Admin</div>
-          <div style={{fontSize:13,color:T.muted,textAlign:"center",marginBottom:24}}>Solo para el creador</div>
-          <input type="password" value={pin} onChange={e=>setPin(e.target.value)} onKeyDown={e=>e.key==="Enter"&&tryPin()} placeholder="PIN" style={{...inp,textAlign:"center",letterSpacing:8,fontSize:22,marginBottom:10}}/>
-          {pinErr&&<div style={{color:T.red,fontSize:12,textAlign:"center",marginBottom:10}}>PIN incorrecto</div>}
-          <button onClick={tryPin} style={btn(true)}>Entrar</button>
-          <button onClick={()=>{setAdminOpen(false);setPin("");setPinErr(false);}} style={btn(false)}>Cancelar</button>
-        </div>
-      </div>
-    );
-
-    if (adminTab==="form") return (
-      <div style={appStyle}>
-        <div style={{padding:"16px 16px 0",position:"sticky",top:0,background:T.bg,zIndex:10}}>
-          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",paddingBottom:14}}>
-            <button onClick={()=>setAdminTab("list")} style={{background:"none",border:"none",color:T.dim,cursor:"pointer",fontSize:14,padding:0}}>← Volver</button>
-            <span style={{fontSize:14,fontWeight:700}}>{editTarget?"Editar cóctel":"Nuevo cóctel"}</span>
-            <div style={{width:50}}/>
-          </div>
-        </div>
-        <div style={{padding:"0 16px 100px"}}>
-          <span style={lbl}>Nombre *</span>
-          <input value={form.name} onChange={e=>setForm(f=>({...f,name:e.target.value}))} placeholder="Nombre del cóctel" style={{...inp,marginBottom:14}}/>
-          <span style={lbl}>Ingredientes * (separados por coma)</span>
-          <input value={form.ingredients} onChange={e=>setForm(f=>({...f,ingredients:e.target.value}))} placeholder="Vodka, Zumo de lima, Sirope simple" style={{...inp,marginBottom:14}}/>
-
-          <div style={{background:T.surface,border:`1px solid ${T.border2}`,borderRadius:10,padding:"12px 14px",marginBottom:14}}>
-            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:form.showMeasures?12:0}}>
-              <div>
-                <div style={{fontSize:13,fontWeight:600}}>Publicar medidas exactas</div>
-                <div style={{fontSize:11,color:T.dim,marginTop:2}}>Puedes guardar tu receta en secreto</div>
-              </div>
-              <div onClick={()=>setForm(f=>({...f,showMeasures:!f.showMeasures}))} style={{width:44,height:24,background:form.showMeasures?T.purpleL:T.border2,borderRadius:20,cursor:"pointer",position:"relative",transition:"background .2s"}}>
-                <div style={{position:"absolute",top:3,left:form.showMeasures?22:3,width:18,height:18,background:"#fff",borderRadius:"50%",transition:"left .2s"}}/>
-              </div>
-            </div>
-            {form.showMeasures&&<input value={form.recipe} onChange={e=>setForm(f=>({...f,recipe:e.target.value}))} placeholder="5 cl Vodka · 2 cl Lima · 1.5 cl Sirope" style={inp}/>}
-          </div>
-
-          <div style={{display:"flex",gap:10,marginBottom:14}}>
-            <div style={{flex:1}}><span style={lbl}>Método</span><select value={form.method} onChange={e=>setForm(f=>({...f,method:e.target.value}))} style={inp}>{METHODS.map(m=><option key={m}>{m}</option>)}</select></div>
-            <div style={{flex:1}}><span style={lbl}>Copa</span><select value={form.glass} onChange={e=>setForm(f=>({...f,glass:e.target.value}))} style={inp}>{GLASSES.map(g=><option key={g}>{g}</option>)}</select></div>
-          </div>
-          <span style={lbl}>Garnish</span>
-          <input value={form.garnish} onChange={e=>setForm(f=>({...f,garnish:e.target.value}))} placeholder="Twist de naranja" style={{...inp,marginBottom:14}}/>
-
-          {/* Extra fields */}
-          <div style={{display:"flex",gap:10,marginBottom:14}}>
-            <div style={{flex:1}}>
-              <span style={lbl}>Dificultad</span>
-              <select value={form.difficulty||"medium"} onChange={e=>setForm(f=>({...f,difficulty:e.target.value}))} style={inp}>
-                <option value="easy">Fácil</option>
-                <option value="medium">Medio</option>
-                <option value="advanced">Avanzado</option>
-              </select>
-            </div>
-            <div style={{flex:1}}>
-              <span style={lbl}>Tiempo aprox.</span>
-              <input value={form.time||""} onChange={e=>setForm(f=>({...f,time:e.target.value}))} placeholder="2 min" style={inp}/>
-            </div>
-          </div>
-          <span style={lbl}>Maridaje / Momento ideal</span>
-          <input value={form.pairing||""} onChange={e=>setForm(f=>({...f,pairing:e.target.value}))} placeholder="Ideal para aperitivo, mariscos…" style={{...inp,marginBottom:14}}/>
-          <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",background:T.surface,border:`1px solid ${T.border2}`,borderRadius:10,padding:"12px 14px",marginBottom:14}}>
-            <div style={{fontSize:13,fontWeight:600}}>Sin alcohol (Mocktail)</div>
-            <div onClick={()=>setForm(f=>({...f,noAlcohol:!f.noAlcohol}))} style={{width:44,height:24,background:form.noAlcohol?T.green:T.border2,borderRadius:20,cursor:"pointer",position:"relative",transition:"background .2s",flexShrink:0}}>
-              <div style={{position:"absolute",top:3,left:form.noAlcohol?22:3,width:18,height:18,background:"#fff",borderRadius:"50%",transition:"left .2s"}}/>
-            </div>
-          </div>
-
-          {/* Duplicate detection */}
-          {form.name && IBA_DB.some(c => c.name.toLowerCase() === form.name.toLowerCase()) && (
-            <div style={{background:"#1a1200",border:"1px solid #fbbf2444",borderRadius:10,padding:"10px 14px",marginBottom:14,fontSize:13,color:T.amber}}>
-              ⚠️ Este nombre coincide con un cóctel IBA clásico. ¿Estás seguro de que es una creación propia?
-            </div>
-          )}
-
-          {/* Public/Private toggle */}
-          <div style={{background:T.surface,border:`1px solid ${T.border2}`,borderRadius:10,padding:"12px 14px",marginBottom:14}}>
-            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-              <div>
-                <div style={{fontSize:13,fontWeight:600}}>Publicar en la comunidad</div>
-                <div style={{fontSize:11,color:T.dim,marginTop:2}}>Otros bartenders podrán verlo y comentarlo</div>
-              </div>
-              <div onClick={()=>setForm(f=>({...f,isPublic:!f.isPublic}))} style={{width:44,height:24,background:form.isPublic?T.purple:T.border2,borderRadius:20,cursor:"pointer",position:"relative",transition:"background .2s",flexShrink:0}}>
-                <div style={{position:"absolute",top:3,left:form.isPublic?22:3,width:18,height:18,background:"#fff",borderRadius:"50%",transition:"left .2s"}}/>
-              </div>
-            </div>
-            {form.isPublic && <div style={{marginTop:10,fontSize:11,color:T.purple}}>✓ Tu cóctel aparecerá en el feed de la comunidad con tu nombre</div>}
-          </div>
-          <span style={lbl}>Notas / Historia del cóctel</span>
-          <textarea value={form.notes} onChange={e=>setForm(f=>({...f,notes:e.target.value}))} placeholder="Inspiración, técnica, maridaje…" style={{...inp,minHeight:80,resize:"vertical",marginBottom:14}}/>
-          <span style={lbl}>Foto</span>
-          <div style={{background:T.surface,border:`1px dashed ${T.border2}`,borderRadius:12,padding:16,textAlign:"center",marginBottom:16,position:"relative",cursor:"pointer",minHeight:80,display:"flex",alignItems:"center",justifyContent:"center"}}>
-            {photoPreview?<img src={photoPreview} alt="" style={{width:"100%",borderRadius:8,maxHeight:160,objectFit:"cover"}}/>:<div style={{color:T.dim,fontSize:13}}>📷 Añadir foto</div>}
-            <input type="file" accept="image/*" onChange={handlePhoto} style={{position:"absolute",inset:0,opacity:0,cursor:"pointer"}}/>
-          </div>
-          <button onClick={saveForm} disabled={!form.name||!form.ingredients} style={{...btn(true),opacity:(!form.name||!form.ingredients)?0.4:1}}>{editTarget?"Guardar cambios":"Publicar cóctel"}</button>
-        </div>
-      </div>
-    );
-
-    return (
-      <div style={appStyle}>
-        <div style={{padding:"16px 16px 0",position:"sticky",top:0,background:T.bg,zIndex:10}}>
-          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",paddingBottom:14}}>
-            <button onClick={()=>{setAdminOpen(false);setAdminAuth(false);}} style={{background:"none",border:"none",color:T.dim,cursor:"pointer",fontSize:14,padding:0}}>← Salir</button>
-            <span style={{fontSize:14,fontWeight:700}}>Panel Admin</span>
-            <button onClick={openAdd} style={{background:"#1e1230",border:`1px solid ${T.purpleD}44`,borderRadius:8,padding:"6px 12px",color:T.purpleL,fontSize:12,cursor:"pointer"}}>+ Nuevo</button>
-          </div>
-        </div>
-        <div style={{padding:"0 16px 80px"}}>
-          <div style={{display:"flex",gap:8,marginBottom:20}}>
-            {[["IBA",IBA_DB.length,T.gold],["Creaciones",customs.length,T.red],["Total",allDB.length,T.purple]].map(([l,n,c])=>(
-              <div key={l} style={{flex:1,background:T.card,border:`1px solid ${T.border}`,borderRadius:12,padding:"12px 8px",textAlign:"center"}}>
-                <div style={{fontSize:22,fontWeight:900,color:c}}>{n}</div>
-                <div style={{fontSize:9,color:T.dim,letterSpacing:1,textTransform:"uppercase"}}>{l}</div>
-              </div>
-            ))}
-          </div>
-          <span style={lbl}>Mis creaciones</span>
-          {!customs.length&&<div style={{color:T.dim,fontSize:13,textAlign:"center",padding:"32px 0"}}>Sin creaciones aún. Pulsa "+ Nuevo".</div>}
-          {customs.map(c=>(
-            <div key={c.id} style={{...card(false),display:"flex",alignItems:"center",gap:12}}>
-              {c.photo&&<img src={c.photo} alt="" style={{width:44,height:44,borderRadius:8,objectFit:"cover",flexShrink:0}}/>}
-              <div style={{flex:1,minWidth:0}}>
-                <div style={{fontSize:14,fontWeight:700,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{c.name}</div>
-                <div style={{fontSize:11,color:T.muted}}>{c.ingredients.slice(0,3).join(", ")}</div>
-              </div>
-              <div style={{display:"flex",gap:6,flexShrink:0}}>
-                <button onClick={()=>openEdit(c)} style={{background:T.surface,border:`1px solid ${T.border2}`,borderRadius:8,padding:"6px 10px",color:T.muted,fontSize:13,cursor:"pointer"}}>✏️</button>
-                <button onClick={()=>setDelConfirm(c.id)} style={{background:"#1a0808",border:"1px solid #ff444422",borderRadius:8,padding:"6px 10px",color:T.red,fontSize:13,cursor:"pointer"}}>🗑️</button>
-              </div>
-            </div>
-          ))}
-        </div>
-        {delConfirm&&(
-          <div style={{position:"fixed",inset:0,background:"#000b",display:"flex",alignItems:"center",justifyContent:"center",zIndex:50,padding:20}}>
-            <div style={{background:T.card,border:`1px solid ${T.border2}`,borderRadius:16,padding:24,maxWidth:300,width:"100%",textAlign:"center"}}>
-              <div style={{fontSize:28,marginBottom:8}}>⚠️</div>
-              <div style={{fontSize:15,fontWeight:700,marginBottom:6}}>¿Borrar este cóctel?</div>
-              <div style={{fontSize:13,color:T.muted,marginBottom:20}}>No se puede deshacer.</div>
-              <div style={{display:"flex",gap:10}}>
-                <button onClick={()=>setDelConfirm(null)} style={{...btn(false),margin:0}}>Cancelar</button>
-                <button onClick={async()=>{
-                  if (user && supabase) await supabase.from("cocktails").delete().eq("id", delConfirm);
-                  setCustoms(p=>p.filter(c=>c.id!==delConfirm));
-                  setDelConfirm(null);showToast("Borrado");
-                }} style={{...btn(false,true),margin:0}}>Borrar</button>
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
-    );
-  }
-
-  // ═══════════════════════════════════
-  // CARD COMPONENT
-  // ═══════════════════════════════════
-  const CocktailCard = ({c}) => {
-    const col = CAT_COLOR[c.cat]||T.purple;
-    const fav = isFav(c.id);
-    const photo = useCocktailPhoto(c, photos);
-    return (
-      <div style={card(false)} onClick={()=>setDetail(c)}>
-        <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",gap:8}}>
-          {photo&&<img src={photo} alt="" style={{width:48,height:48,borderRadius:10,objectFit:"cover",flexShrink:0}}/>}
-          <div style={{flex:1,minWidth:0}}>
-            <div style={{fontSize:15,fontWeight:700,marginBottom:3}}>{c.name}</div>
-            <div style={{fontSize:11,color:T.muted}}>{METHOD_ICON[c.method]} {c.method} · {c.ingredients.slice(0,3).join(", ")}{c.ingredients.length>3?"…":""}</div>
-            {c.flavor&&<div style={{display:"flex",gap:4,marginTop:6,flexWrap:"wrap"}}>{c.flavor.slice(0,3).map(f=><span key={f} style={{...tag(T.dim),fontSize:8}}>{f}</span>)}</div>}
-          </div>
-          <div style={{display:"flex",gap:6,alignItems:"center",flexShrink:0}}>
-            <button onClick={e=>{e.stopPropagation();toggleFav(c.id);showToast(fav?"Quitado":"❤️ Favorito");}} style={{background:"none",border:"none",fontSize:15,cursor:"pointer",padding:2}}>{fav?"❤️":"🤍"}</button>
-            <span style={tag(col)}>{CAT_LABEL[c.cat]||"MÍO"}</span>
-          </div>
-        </div>
-      </div>
-    );
-  };
-
-  // ═══════════════════════════════════
   // MAIN APP
   // ═══════════════════════════════════
   const appShell = { minHeight:"100vh", background:T.bg, color:T.text, fontFamily:"'Inter',system-ui,sans-serif", maxWidth:480, margin:"0 auto", display:"flex", flexDirection:"column" };
@@ -960,12 +766,9 @@ export default function App({ user, profile: cloudProfile, onProfileUpdate, onSi
             <span style={{fontSize:18,fontWeight:900,letterSpacing:3,color:"#fff",fontVariant:"small-caps"}}>JIGGER</span>
             <span style={{fontSize:8,color:"#1e1e38",letterSpacing:2,marginLeft:10,textTransform:"uppercase"}}>Bartender Community</span>
           </div>
-          <div style={{display:"flex",gap:8}}>
-            <button onClick={()=>setThemeMode(m => m==="dark"?"light":m==="light"?"auto":"dark")} style={{background:"none",border:`1px solid ${T.border}`,borderRadius:8,padding:"5px 10px",color:T.dim,fontSize:13,cursor:"pointer"}}>
-              {themeMode==="dark"?"🌙":themeMode==="light"?"☀️":"🌓"}
-            </button>
-            <button onClick={()=>{setAdminOpen(true);setPin("");setPinErr(false);}} style={{background:"none",border:`1px solid ${T.border}`,borderRadius:8,padding:"5px 10px",color:T.dim,fontSize:11,cursor:"pointer"}}>⚙️</button>
-          </div>
+          <button onClick={()=>setThemeMode(m => m==="dark"?"light":m==="light"?"auto":"dark")} style={{background:"none",border:`1px solid ${T.border}`,borderRadius:8,padding:"5px 10px",color:T.dim,fontSize:13,cursor:"pointer"}}>
+            {themeMode==="dark"?"🌙":themeMode==="light"?"☀️":"🌓"}
+          </button>
         </div>
       </div>
 
@@ -1053,7 +856,7 @@ export default function App({ user, profile: cloudProfile, onProfileUpdate, onSi
             <div style={{background:T.card,border:`1px solid ${T.amber}33`,borderRadius:14,padding:20,marginTop:8}}>
               <div style={{fontSize:15,fontWeight:700,marginBottom:6}}>Combinación sin nombre en la IBA 🤔</div>
               <div style={{fontSize:13,color:T.muted,marginBottom:14}}>Puede que sea una creación tuya. ¿La guardamos?</div>
-              <button onClick={()=>{setAdminOpen(true);setPin("");}} style={{background:`${T.amber}20`,border:`1px solid ${T.amber}44`,borderRadius:10,padding:"10px 16px",color:T.amber,fontSize:13,fontWeight:700,cursor:"pointer",width:"100%"}}>
+              <button onClick={()=>{setTab("perfil");openAdd();}} style={{background:`${T.amber}20`,border:`1px solid ${T.amber}44`,borderRadius:10,padding:"10px 16px",color:T.amber,fontSize:13,fontWeight:700,cursor:"pointer",width:"100%"}}>
                 ✦ Crear este cóctel
               </button>
             </div>
@@ -1171,6 +974,106 @@ export default function App({ user, profile: cloudProfile, onProfileUpdate, onSi
       {/* ─── PERFIL ─── */}
       {tab==="perfil"&&(
         <div style={{flex:1,overflowY:"auto"}}>
+
+          {/* ── FORM MODAL ── */}
+          {showForm&&(
+            <div style={{position:"fixed",inset:0,background:"#000c",zIndex:50,display:"flex",flexDirection:"column",justifyContent:"flex-end"}}>
+              <div style={{background:T.bg,borderRadius:"20px 20px 0 0",padding:"20px 16px",maxHeight:"90vh",overflowY:"auto"}}>
+                <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:20}}>
+                  <div style={{fontSize:16,fontWeight:800}}>{editTarget?"Editar cóctel":"Nuevo cóctel"}</div>
+                  <button onClick={()=>{setShowForm(false);setEditTarget(null);}} style={{background:"none",border:"none",color:T.dim,fontSize:22,cursor:"pointer"}}>✕</button>
+                </div>
+
+                <span style={lbl}>Nombre *</span>
+                <input value={form.name} onChange={e=>setForm(f=>({...f,name:e.target.value}))} placeholder="" style={{...inp,marginBottom:14}}/>
+                {form.name&&IBA_DB.some(c=>c.name.toLowerCase()===form.name.toLowerCase())&&(
+                  <div style={{background:"#1a1200",border:"1px solid #fbbf2444",borderRadius:10,padding:"10px 14px",marginBottom:14,fontSize:13,color:T.amber}}>⚠️ Este nombre coincide con un cóctel IBA clásico. ¿Seguro que es una creación propia?</div>
+                )}
+
+                <span style={lbl}>Ingredientes * (separados por coma)</span>
+                <input value={form.ingredients} onChange={e=>setForm(f=>({...f,ingredients:e.target.value}))} placeholder="" style={{...inp,marginBottom:14}}/>
+
+                <div style={{background:T.surface,border:`1px solid ${T.border2}`,borderRadius:10,padding:"12px 14px",marginBottom:14}}>
+                  <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:form.showMeasures?12:0}}>
+                    <div>
+                      <div style={{fontSize:13,fontWeight:600}}>Publicar medidas exactas</div>
+                      <div style={{fontSize:11,color:T.dim,marginTop:2}}>Puedes guardar tu receta en secreto</div>
+                    </div>
+                    <div onClick={()=>setForm(f=>({...f,showMeasures:!f.showMeasures}))} style={{width:44,height:24,background:form.showMeasures?T.purple:T.border2,borderRadius:20,cursor:"pointer",position:"relative",transition:"background .2s",flexShrink:0}}>
+                      <div style={{position:"absolute",top:3,left:form.showMeasures?22:3,width:18,height:18,background:"#fff",borderRadius:"50%",transition:"left .2s"}}/>
+                    </div>
+                  </div>
+                  {form.showMeasures&&<input value={form.recipe} onChange={e=>setForm(f=>({...f,recipe:e.target.value}))} placeholder="" style={inp}/>}
+                </div>
+
+                <div style={{display:"flex",gap:10,marginBottom:14}}>
+                  <div style={{flex:1}}>
+                    <span style={lbl}>Método</span>
+                    <select value={form.method} onChange={e=>setForm(f=>({...f,method:e.target.value}))} style={inp}>{METHODS.map(m=><option key={m}>{m}</option>)}</select>
+                  </div>
+                  <div style={{flex:1}}>
+                    <span style={lbl}>Copa</span>
+                    <select value={form.glass} onChange={e=>setForm(f=>({...f,glass:e.target.value}))} style={inp}>{GLASSES.map(g=><option key={g}>{g}</option>)}</select>
+                  </div>
+                </div>
+
+                <div style={{display:"flex",gap:10,marginBottom:14}}>
+                  <div style={{flex:1}}>
+                    <span style={lbl}>Dificultad</span>
+                    <select value={form.difficulty||"medium"} onChange={e=>setForm(f=>({...f,difficulty:e.target.value}))} style={inp}>
+                      <option value="easy">Fácil</option>
+                      <option value="medium">Medio</option>
+                      <option value="advanced">Avanzado</option>
+                    </select>
+                  </div>
+                  <div style={{flex:1}}>
+                    <span style={lbl}>Tiempo</span>
+                    <input value={form.time||""} onChange={e=>setForm(f=>({...f,time:e.target.value}))} placeholder="" style={inp}/>
+                  </div>
+                </div>
+
+                <span style={lbl}>Garnish</span>
+                <input value={form.garnish} onChange={e=>setForm(f=>({...f,garnish:e.target.value}))} placeholder="" style={{...inp,marginBottom:14}}/>
+
+                <span style={lbl}>Maridaje / Momento ideal</span>
+                <input value={form.pairing||""} onChange={e=>setForm(f=>({...f,pairing:e.target.value}))} placeholder="" style={{...inp,marginBottom:14}}/>
+
+                <span style={lbl}>Historia / Notas</span>
+                <textarea value={form.notes} onChange={e=>setForm(f=>({...f,notes:e.target.value}))} placeholder="" style={{...inp,minHeight:72,resize:"vertical",marginBottom:14}}/>
+
+                <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",background:T.surface,border:`1px solid ${T.border2}`,borderRadius:10,padding:"12px 14px",marginBottom:14}}>
+                  <div style={{fontSize:13,fontWeight:600}}>Sin alcohol (Mocktail)</div>
+                  <div onClick={()=>setForm(f=>({...f,noAlcohol:!f.noAlcohol}))} style={{width:44,height:24,background:form.noAlcohol?T.green:T.border2,borderRadius:20,cursor:"pointer",position:"relative",transition:"background .2s",flexShrink:0}}>
+                    <div style={{position:"absolute",top:3,left:form.noAlcohol?22:3,width:18,height:18,background:"#fff",borderRadius:"50%",transition:"left .2s"}}/>
+                  </div>
+                </div>
+
+                <div style={{background:T.surface,border:`1px solid ${T.border2}`,borderRadius:10,padding:"12px 14px",marginBottom:14}}>
+                  <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+                    <div>
+                      <div style={{fontSize:13,fontWeight:600}}>Publicar en la comunidad</div>
+                      <div style={{fontSize:11,color:T.dim,marginTop:2}}>Otros bartenders podrán verlo</div>
+                    </div>
+                    <div onClick={()=>setForm(f=>({...f,isPublic:!f.isPublic}))} style={{width:44,height:24,background:form.isPublic?T.purple:T.border2,borderRadius:20,cursor:"pointer",position:"relative",transition:"background .2s",flexShrink:0}}>
+                      <div style={{position:"absolute",top:3,left:form.isPublic?22:3,width:18,height:18,background:"#fff",borderRadius:"50%",transition:"left .2s"}}/>
+                    </div>
+                  </div>
+                  {form.isPublic&&<div style={{marginTop:8,fontSize:11,color:T.purple}}>✓ Aparecerá en la comunidad con tu nombre</div>}
+                </div>
+
+                <span style={lbl}>Foto</span>
+                <div style={{background:T.surface,border:`1px dashed ${T.border2}`,borderRadius:12,padding:16,textAlign:"center",marginBottom:16,position:"relative",cursor:"pointer",minHeight:72,display:"flex",alignItems:"center",justifyContent:"center"}}>
+                  {photoPreview?<img src={photoPreview} alt="" style={{width:"100%",borderRadius:8,maxHeight:140,objectFit:"cover"}}/>:<div style={{color:T.dim,fontSize:13}}>📷 Añadir foto</div>}
+                  <input type="file" accept="image/*" onChange={e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{setPhotoPreview(ev.target.result);setForm(x=>({...x,photo:ev.target.result}));};r.readAsDataURL(f);}} style={{position:"absolute",inset:0,opacity:0,cursor:"pointer"}}/>
+                </div>
+
+                <button onClick={saveForm} disabled={!form.name||!form.ingredients} style={{...btn(true),opacity:(!form.name||!form.ingredients)?0.4:1}}>
+                  {editTarget?"Guardar cambios":"Publicar cóctel"}
+                </button>
+              </div>
+            </div>
+          )}
+
           {!editProfile?(
             <>
               {/* HERO */}
@@ -1212,7 +1115,7 @@ export default function App({ user, profile: cloudProfile, onProfileUpdate, onSi
                   <>
                     {!customs.length&&(
                       <div style={{background:T.card,border:`1px dashed ${T.border2}`,borderRadius:14,padding:28,textAlign:"center",color:T.dim,fontSize:13,lineHeight:1.7}}>
-                        Tu carta de autor está vacía.<br/>Crea tu primer cóctel desde ⚙️ Admin
+                        Tu carta de autor está vacía.<br/>Pulsa + para crear tu primer cóctel
                       </div>
                     )}
                     {customs.map(c=>{
@@ -1235,7 +1138,7 @@ export default function App({ user, profile: cloudProfile, onProfileUpdate, onSi
                             {c.show_measures===false&&<div style={{fontSize:12,color:T.dim,fontStyle:"italic",marginBottom:10}}>Medidas no publicadas</div>}
                             {c.notes&&<div style={{fontSize:12,color:T.muted,lineHeight:1.6,marginBottom:10}}>{c.notes}</div>}
                             <div style={{display:"flex",gap:8}}>
-                              <button onClick={()=>{setAdminOpen(true);setTimeout(()=>openEdit(c),100);}} style={{flex:1,background:`${T.purple}22`,border:`1px solid ${T.purple}44`,borderRadius:10,padding:"9px",color:T.purple,fontSize:13,fontWeight:700,cursor:"pointer"}}>✏️ Editar</button>
+                              <button onClick={()=>openEdit(c)} style={{flex:1,background:`${T.purple}22`,border:`1px solid ${T.purple}44`,borderRadius:10,padding:"9px",color:T.purple,fontSize:13,fontWeight:700,cursor:"pointer"}}>✏️ Editar</button>
                               <button onClick={()=>toggleFav(c.id)} style={{background:fav?`${T.red}22`:"none",border:`1px solid ${fav?T.red:T.border2}`,borderRadius:10,padding:"9px 14px",color:fav?T.red:T.dim,fontSize:14,cursor:"pointer"}}>{fav?"❤️":"🤍"}</button>
                             </div>
                           </div>
@@ -1258,7 +1161,8 @@ export default function App({ user, profile: cloudProfile, onProfileUpdate, onSi
               </div>
 
               <div style={{padding:"0 16px 8px"}}>
-                <button onClick={()=>{setProfileForm({...profile});setEditProfile(true);}} style={btn(true)}>✏️ Editar perfil</button>
+                <button onClick={()=>openAdd()} style={{...btn(true),background:`linear-gradient(135deg,${T.purpleD},${T.purple})`}}>+ Crear cóctel</button>
+                <button onClick={()=>{setProfileForm({...profile});setEditProfile(true);}} style={btn(false)}>✏️ Editar perfil</button>
                 {onSignOut&&<button onClick={onSignOut} style={{background:"none",border:"1px solid #ff6b6b33",borderRadius:10,padding:"12px 20px",color:T.red,fontSize:14,cursor:"pointer",width:"100%",marginBottom:10}}>Cerrar sesión</button>}
               </div>
             </>
