@@ -741,6 +741,31 @@ export default function App({ user, profile: cloudProfile, onProfileUpdate, onSi
   // ═══════════════════════════════════
   // MAIN APP
   // ═══════════════════════════════════
+
+  // ── COCKTAIL CARD ──
+  const CocktailCard = ({c}) => {
+    const col = CAT_COLOR[c.cat]||T.purple;
+    const fav = isFav(c.id);
+    const photo = useCocktailPhoto(c);
+    return (
+      <div style={{background:T.card,border:`1px solid ${T.border}`,borderRadius:14,padding:"14px 16px",marginBottom:10,cursor:"pointer"}} onClick={()=>setDetail(c)}>
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",gap:8}}>
+          {photo&&<img src={photo} alt="" style={{width:48,height:48,borderRadius:10,objectFit:"cover",flexShrink:0}}/>}
+          <div style={{flex:1,minWidth:0}}>
+            <div style={{fontSize:15,fontWeight:700,marginBottom:3}}>{c.name}</div>
+            <div style={{fontSize:11,color:T.muted}}>{METHOD_ICON[c.method]} {c.method} · {c.ingredients.slice(0,3).join(", ")}{c.ingredients.length>3?"…":""}</div>
+            {c.isCustom&&profile?.name&&<div style={{fontSize:10,color:T.purple,marginTop:2}}>por {profile.name}{profile.cert?` · ${profile.cert}`:""}</div>}
+            {(c.flavor||[]).length>0&&<div style={{display:"flex",gap:4,marginTop:5,flexWrap:"wrap"}}>{(c.flavor||[]).slice(0,3).map(f=><span key={f} style={{background:`${T.dim}20`,color:T.dim,borderRadius:20,padding:"2px 7px",fontSize:8,fontWeight:700}}>{f}</span>)}</div>}
+          </div>
+          <div style={{display:"flex",gap:6,alignItems:"center",flexShrink:0}}>
+            <button onClick={e=>{e.stopPropagation();toggleFav(c.id);showToast(fav?"Quitado":"❤️ Favorito");}} style={{background:"none",border:"none",fontSize:15,cursor:"pointer",padding:2}}>{fav?"❤️":"🤍"}</button>
+            <span style={{background:`${col}25`,color:col,borderRadius:20,padding:"2px 9px",fontSize:9,fontWeight:700,letterSpacing:.5}}>{CAT_LABEL[c.cat]||"MÍO"}</span>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   const appShell = { minHeight:"100vh", background:T.bg, color:T.text, fontFamily:"'Inter',system-ui,sans-serif", maxWidth:480, margin:"0 auto", display:"flex", flexDirection:"column" };
   const globalStyle = `
     @keyframes heartPop { 0%{transform:scale(1)} 50%{transform:scale(1.4)} 100%{transform:scale(1)} }
