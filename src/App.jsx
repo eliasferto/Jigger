@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect, useCallback } from "react";
+import Community from "./Community.jsx";
 
 // ══════════════════════════════════════════════════════════
 // JIGGER v2 — Bartender Community App
@@ -487,7 +488,7 @@ export default function App({ user, profile: cloudProfile, onProfileUpdate, onSi
   const [pin, setPin] = useState(""); const [pinErr, setPinErr] = useState(false);
   const [adminTab, setAdminTab] = useState("list");
   const [editTarget, setEditTarget] = useState(null);
-  const [form, setForm] = useState({ name:"", ingredients:"", recipe:"", showMeasures:true, method:"Shake", glass:"Cocktail", garnish:"", notes:"", photo:"" });
+  const [form, setForm] = useState({ name:"", ingredients:"", recipe:"", showMeasures:true, isPublic:false, method:"Shake", glass:"Cocktail", garnish:"", notes:"", photo:"" });
   const [photoPreview, setPhotoPreview] = useState(null);
   const [delConfirm, setDelConfirm] = useState(null);
 
@@ -542,7 +543,7 @@ export default function App({ user, profile: cloudProfile, onProfileUpdate, onSi
   // Admin
   const tryPin = () => { if(pin===ADMIN_PIN){setAdminAuth(true);setPinErr(false);setAdminTab("list");}else{setPinErr(true);setPin("");} };
   const openAdd = () => { setEditTarget(null); setForm({name:"",ingredients:"",recipe:"",showMeasures:true,method:"Shake",glass:"Cocktail",garnish:"",notes:"",photo:""}); setPhotoPreview(null); setAdminTab("form"); };
-  const openEdit = (c) => { setEditTarget(c); setForm({name:c.name,ingredients:c.ingredients.join(", "),recipe:c.recipe||"",showMeasures:c.showMeasures!==false,method:c.method||"Shake",glass:c.glass||"Cocktail",garnish:c.garnish||"",notes:c.notes||"",photo:c.photo||""}); setPhotoPreview(c.photo||null); setAdminTab("form"); };
+  const openEdit = (c) => { setEditTarget(c); setForm({name:c.name,ingredients:c.ingredients.join(", "),recipe:c.recipe||"",showMeasures:c.showMeasures!==false,isPublic:c.is_public||false,method:c.method||"Shake",glass:c.glass||"Cocktail",garnish:c.garnish||"",notes:c.notes||"",photo:c.photo||""}); setPhotoPreview(c.photo||null); setAdminTab("form"); };
   const saveForm = async () => {
     if(!form.name||!form.ingredients) return;
     const ings = form.ingredients.split(",").map(s=>s.trim()).filter(Boolean);
@@ -556,7 +557,7 @@ export default function App({ user, profile: cloudProfile, onProfileUpdate, onSi
       garnish: form.garnish,
       notes: form.notes,
       photo_url: form.photo,
-      is_public: false,
+      is_public: form.isPublic || false,
       user_id: user?.id,
     };
     if (user && supabase) {
@@ -793,6 +794,27 @@ export default function App({ user, profile: cloudProfile, onProfileUpdate, onSi
           </div>
           <span style={lbl}>Garnish</span>
           <input value={form.garnish} onChange={e=>setForm(f=>({...f,garnish:e.target.value}))} placeholder="Twist de naranja" style={{...inp,marginBottom:14}}/>
+
+          {/* Duplicate detection */}
+          {form.name && IBA_DB.some(c => c.name.toLowerCase() === form.name.toLowerCase()) && (
+            <div style={{background:"#1a1200",border:"1px solid #fbbf2444",borderRadius:10,padding:"10px 14px",marginBottom:14,fontSize:13,color:T.amber}}>
+              ⚠️ Este nombre coincide con un cóctel IBA clásico. ¿Estás seguro de que es una creación propia?
+            </div>
+          )}
+
+          {/* Public/Private toggle */}
+          <div style={{background:T.surface,border:`1px solid ${T.border2}`,borderRadius:10,padding:"12px 14px",marginBottom:14}}>
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+              <div>
+                <div style={{fontSize:13,fontWeight:600}}>Publicar en la comunidad</div>
+                <div style={{fontSize:11,color:T.dim,marginTop:2}}>Otros bartenders podrán verlo y comentarlo</div>
+              </div>
+              <div onClick={()=>setForm(f=>({...f,isPublic:!f.isPublic}))} style={{width:44,height:24,background:form.isPublic?T.purple:T.border2,borderRadius:20,cursor:"pointer",position:"relative",transition:"background .2s",flexShrink:0}}>
+                <div style={{position:"absolute",top:3,left:form.isPublic?22:3,width:18,height:18,background:"#fff",borderRadius:"50%",transition:"left .2s"}}/>
+              </div>
+            </div>
+            {form.isPublic && <div style={{marginTop:10,fontSize:11,color:T.purple}}>✓ Tu cóctel aparecerá en el feed de la comunidad con tu nombre</div>}
+          </div>
           <span style={lbl}>Notas / Historia del cóctel</span>
           <textarea value={form.notes} onChange={e=>setForm(f=>({...f,notes:e.target.value}))} placeholder="Inspiración, técnica, maridaje…" style={{...inp,minHeight:80,resize:"vertical",marginBottom:14}}/>
           <span style={lbl}>Foto</span>
@@ -1038,6 +1060,11 @@ export default function App({ user, profile: cloudProfile, onProfileUpdate, onSi
         </div>
       )}
 
+      {/* ─── COMUNIDAD ─── */}
+      {tab==="community"&&(
+        <Community user={user} profile={profile} supabase={supabase} T={T} />
+      )}
+
       {/* ─── TÉCNICAS ─── */}
       {tab==="tecnicas"&&(
         <div style={{flex:1,padding:"0 16px 100px",overflowY:"auto"}}>
@@ -1169,7 +1196,7 @@ export default function App({ user, profile: cloudProfile, onProfileUpdate, onSi
 
       {/* ─── NAV ─── */}
       <div style={{position:"fixed",bottom:0,left:"50%",transform:"translateX(-50%)",width:"100%",maxWidth:480,background:T.surface,borderTop:`1px solid ${T.border}`,display:"flex",zIndex:20}}>
-        {[["builder","🔍","Buscar"],["library","📖","Biblioteca"],["tecnicas","🍸","Técnicas"],["cristaleria","🥂","Copas"],["glosario","📝","Glosario"],["perfil","👤","Perfil"]].map(([t,icon,label])=>(
+        {[["builder","🔍","Buscar"],["library","📖","Biblioteca"],["community","🌍","Comunidad"],["tecnicas","🍸","Técnicas"],["cristaleria","🥂","Copas"],["perfil","👤","Perfil"]].map(([t,icon,label])=>(
           <button key={t} onClick={()=>setTab(t)} style={{flex:1,padding:"10px 2px 14px",background:"none",border:"none",borderTop:`2px solid ${tab===t?T.purpleL:"transparent"}`,color:tab===t?T.purpleL:"#2e2e50",fontSize:9,fontWeight:700,cursor:"pointer",letterSpacing:.5,textTransform:"uppercase",display:"flex",flexDirection:"column",alignItems:"center",gap:3,transition:"color .15s"}}>
             <span style={{fontSize:20}}>{icon}</span>{label}
           </button>
