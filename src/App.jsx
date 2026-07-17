@@ -361,10 +361,21 @@ function shareRecipe(c) {
 
 // ── STYLE HELPERS ──
 const card = (hi, border) => ({ background: hi ? "#13102a" : T.card, border:`1px solid ${border||( hi ? T.purpleD+"55" : T.border)}`, borderRadius:14, padding:"14px 16px", marginBottom:10, cursor:"pointer" });
-const chip = (on, col) => ({ background: on ? (col||T.purpleD)+"33" : T.surface, border:`1px solid ${on?(col||T.purpleD):T.border2}`, borderRadius:20, padding:"6px 13px", color: on?(col||T.purpleL):T.muted, fontSize:12, cursor:"pointer", fontWeight:on?600:400, whiteSpace:"nowrap" });
+const chip = (on, col) => ({
+  background: on ? (col||T.purpleD)+"44" : T.isDark ? "#ffffff18" : "#0d0b1e18",
+  border: `1px solid ${on?(col||T.purpleL)+"88":T.isDark?"#ffffff30":"#0d0b1e30"}`,
+  borderRadius: 20,
+  padding: "7px 15px",
+  color: on ? (col||T.purpleL) : T.text,
+  fontSize: 13,
+  cursor: "pointer",
+  fontWeight: on ? 700 : 500,
+  whiteSpace: "nowrap",
+  transition: "all .15s",
+});
 const btn = (p, danger) => ({ background:danger?"#1a0808":p?`linear-gradient(135deg,${T.purpleD},${T.purpleL})`:"#111120", border:danger?"1px solid #ff444433":p?"none":`1px solid ${T.border2}`, borderRadius:10, padding:"12px 20px", color:danger?T.red:p?"#fff":T.muted, fontSize:14, fontWeight:p||danger?700:400, cursor:"pointer", width:"100%", marginBottom:10 });
-const lbl = { fontSize:9, letterSpacing:2, color:T.dim, textTransform:"uppercase", marginBottom:8, display:"block" };
-const inp = { width:"100%", background:T.surface, border:`1px solid ${T.border2}`, borderRadius:10, padding:"11px 14px", color:T.text, fontSize:14, outline:"none", boxSizing:"border-box", WebkitAppearance:"none" };
+const lbl = { fontSize:9, letterSpacing:2.5, color:T.muted, textTransform:"uppercase", marginBottom:8, display:"block", fontWeight:700 };
+const inp = { width:"100%", background:T.isDark?"#ffffff12":"#0d0b1e08", border:`1px solid ${T.border2}`, borderRadius:10, padding:"11px 14px", color:T.text, fontSize:14, outline:"none", boxSizing:"border-box", WebkitAppearance:"none" };
 const tag = (col) => ({ background:`${col}25`, color:col, borderRadius:20, padding:"2px 9px", fontSize:9, fontWeight:700, letterSpacing:.5 });
 const divider = { height:1, background:T.border, margin:"18px 0" };
 
@@ -787,9 +798,12 @@ export default function App({ user, profile: cloudProfile, onProfileUpdate, onSi
       {/* TOPBAR */}
       <div style={{padding:"16px 16px 0",background:T.bg,position:"sticky",top:0,zIndex:10}}>
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",paddingBottom:14}}>
-          <div>
-            <span style={{fontSize:18,fontWeight:900,letterSpacing:3,color:"#fff",fontVariant:"small-caps"}}>JIGGER</span>
-            <span style={{fontSize:8,color:"#1e1e38",letterSpacing:2,marginLeft:10,textTransform:"uppercase"}}>Bartender Community</span>
+          <div style={{display:"flex",alignItems:"center",gap:10}}>
+            <div style={{background:`linear-gradient(135deg,${T.purpleD},${T.purpleL})`,borderRadius:10,width:34,height:34,display:"flex",alignItems:"center",justifyContent:"center",fontSize:16,fontWeight:900,color:"#fff",flexShrink:0}}>J</div>
+            <div>
+              <div style={{fontSize:17,fontWeight:900,letterSpacing:3,color:T.text,lineHeight:1}}>JIGGER</div>
+              <div style={{fontSize:8,color:T.dim,letterSpacing:2,textTransform:"uppercase"}}>Bartender Community</div>
+            </div>
           </div>
           <button onClick={()=>setThemeMode(m => m==="dark"?"light":m==="light"?"auto":"dark")} style={{background:"none",border:`1px solid ${T.border}`,borderRadius:8,padding:"5px 10px",color:T.dim,fontSize:13,cursor:"pointer"}}>
             {themeMode==="dark"?"🌙":themeMode==="light"?"☀️":"🌓"}
@@ -1226,7 +1240,7 @@ export default function App({ user, profile: cloudProfile, onProfileUpdate, onSi
       )}
 
       {/* ─── NAV ─── */}
-      <div style={{position:"fixed",bottom:0,left:"50%",transform:"translateX(-50%)",width:"100%",maxWidth:480,background:T.surface,borderTop:`1px solid ${T.border}`,display:"flex",zIndex:20}}>
+      <div style={{position:"fixed",bottom:0,left:"50%",transform:"translateX(-50%)",width:"100%",maxWidth:480,background:T.isDark?"#0c0c1e":T.surface,borderTop:`1px solid ${T.border2}`,display:"flex",zIndex:20,backdropFilter:"blur(12px)"}}>
         {[["builder","🔍","Buscar"],["library","📖","Biblioteca"],["community","🌍","Comunidad"],["tecnicas","🍸","Técnicas"],["cristaleria","🥂","Copas"],["perfil","👤","Perfil"]].map(([t,icon,label])=>(
           <button key={t} onClick={()=>setTab(t)} style={{flex:1,padding:"10px 2px 14px",background:"none",border:"none",borderTop:`2px solid ${tab===t?T.purpleL:"transparent"}`,color:tab===t?T.purpleL:"#2e2e50",fontSize:9,fontWeight:700,cursor:"pointer",letterSpacing:.5,textTransform:"uppercase",display:"flex",flexDirection:"column",alignItems:"center",gap:3}}>
             <span style={{fontSize:20}}>{icon}</span>{label}
