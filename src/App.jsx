@@ -361,7 +361,7 @@ function shareRecipe(c) {
 
 // ── STYLE HELPERS ──
 const card = (hi, border) => ({ background: hi ? "#13102a" : T.card, border:`1px solid ${border||( hi ? T.purpleD+"55" : T.border)}`, borderRadius:14, padding:"14px 16px", marginBottom:10, cursor:"pointer" });
-const chip = (on, col) => ({ background: on ? (col||T.purpleD)+"33" : T.surface, border:`1px solid ${on?(col||T.purpleD):T.border}`, borderRadius:20, padding:"6px 13px", color: on?(col||T.purpleL):T.dim, fontSize:12, cursor:"pointer", fontWeight:on?600:400, whiteSpace:"nowrap" });
+const chip = (on, col) => ({ background: on ? (col||T.purpleD)+"33" : T.surface, border:`1px solid ${on?(col||T.purpleD):T.border2}`, borderRadius:20, padding:"6px 13px", color: on?(col||T.purpleL):T.muted, fontSize:12, cursor:"pointer", fontWeight:on?600:400, whiteSpace:"nowrap" });
 const btn = (p, danger) => ({ background:danger?"#1a0808":p?`linear-gradient(135deg,${T.purpleD},${T.purpleL})`:"#111120", border:danger?"1px solid #ff444433":p?"none":`1px solid ${T.border2}`, borderRadius:10, padding:"12px 20px", color:danger?T.red:p?"#fff":T.muted, fontSize:14, fontWeight:p||danger?700:400, cursor:"pointer", width:"100%", marginBottom:10 });
 const lbl = { fontSize:9, letterSpacing:2, color:T.dim, textTransform:"uppercase", marginBottom:8, display:"block" };
 const inp = { width:"100%", background:T.surface, border:`1px solid ${T.border2}`, borderRadius:10, padding:"11px 14px", color:T.text, fontSize:14, outline:"none", boxSizing:"border-box", WebkitAppearance:"none" };
