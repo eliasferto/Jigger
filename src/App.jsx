@@ -965,7 +965,7 @@ export default function App({ user, profile: cloudProfile, onProfileUpdate, onSi
               <div style={{display:"flex",alignItems:"center",gap:14}}>
                 <div style={{fontSize:32,flexShrink:0,background:`${t.color}22`,borderRadius:12,width:52,height:52,display:"flex",alignItems:"center",justifyContent:"center"}}>{t.icon}</div>
                 <div style={{flex:1}}>
-                  <div style={{fontSize:16,fontWeight:800,marginBottom:3,color:T.text}}>{t.name}</div>
+                  <div style={{fontSize:16,fontWeight:800,marginBottom:3,color:T.isDark?"#ffffff":T.text}}>{t.name}</div>
                   <div style={{fontSize:12,color:t.color,fontWeight:600}}>{t.subtitle}</div>
                 </div>
                 <span style={{color:T.muted,fontSize:20,fontWeight:700}}>›</span>
