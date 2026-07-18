@@ -362,14 +362,16 @@ function shareRecipe(c) {
 // ── STYLE HELPERS ──
 const card = (hi, border) => ({ background: hi ? "#13102a" : T.card, border:`1px solid ${border||( hi ? T.purpleD+"55" : T.border)}`, borderRadius:14, padding:"14px 16px", marginBottom:10, cursor:"pointer" });
 const chip = (on, col) => ({
-  background: on ? (col||T.purpleD)+"44" : T.isDark ? "#ffffff18" : "#0d0b1e18",
-  border: `1px solid ${on?(col||T.purpleL)+"88":T.isDark?"#ffffff30":"#0d0b1e30"}`,
+  background: on
+    ? (col||T.purpleD)+"55"
+    : T.isDark ? "#1e1e3a" : "#e8e4f8",
+  border: `2px solid ${on ? (col||T.purpleL) : T.isDark ? "#3a3a60" : "#9a94cc"}`,
   borderRadius: 20,
-  padding: "7px 15px",
-  color: on ? (col||T.purpleL) : T.text,
+  padding: "7px 16px",
+  color: on ? (col||T.purpleL) : T.isDark ? "#ffffff" : "#1a1535",
   fontSize: 13,
   cursor: "pointer",
-  fontWeight: on ? 700 : 500,
+  fontWeight: on ? 700 : 600,
   whiteSpace: "nowrap",
   transition: "all .15s",
 });
