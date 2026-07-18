@@ -990,9 +990,9 @@ export default function App({ user, profile: cloudProfile, onProfileUpdate, onSi
                   }
                 </div>
                 <div style={{flex:1,padding:"12px 14px"}}>
-                  <div style={{fontSize:15,fontWeight:800,marginBottom:2}}>{cr.name}</div>
-                  <div style={{fontSize:11,color:T.muted}}>{cr.aka} · {cr.capacidad}</div>
-                  <div style={{fontSize:11,color:T.dim,marginTop:4}}>{cr.cocktails.slice(0,3).join(", ")}{cr.cocktails.length>3?"…":""}</div>
+                  <div style={{fontSize:15,fontWeight:800,marginBottom:2,color:T.isDark?"#ffffff":"#0a0820"}}>{cr.name}</div>
+                  <div style={{fontSize:11,color:T.isDark?"#b0a8d0":T.muted,marginBottom:2}}>{cr.aka} · {cr.capacidad}</div>
+                  <div style={{fontSize:11,color:T.isDark?"#8880b0":T.dim,marginTop:2}}>{cr.cocktails.slice(0,3).join(", ")}{cr.cocktails.length>3?"…":""}</div>
                 </div>
                 <span style={{color:T.dim,fontSize:18,paddingRight:14}}>›</span>
               </div>
