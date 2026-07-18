@@ -70,7 +70,6 @@ const CRISTALERIA = [
     id: "copa-cocktail",
     name: "Copa Cocktail",
     emoji: "🍸",
-    photo: "https://images.unsplash.com/photo-1587282863750-0a297a50b553?auto=format&fit=crop&w=600&q=80",
     aka: "Copa Martini",
     desc: "La copa más icónica de la coctelería. Forma de V invertida con tallo largo. Mantiene el cóctel frío sin necesidad de hielo y permite apreciar el color y aroma.",
     capacidad: "90–150 ml",
@@ -82,7 +81,6 @@ const CRISTALERIA = [
     id: "copa-coupe",
     name: "Copa Coupe",
     emoji: "🥂",
-    photo: "https://images.unsplash.com/photo-1691404016321-b210547c6d7a?auto=format&fit=crop&w=600&q=80",
     aka: "Copa Champagne clásica",
     desc: "Copa redonda y ancha con tallo largo. Elegante y vintage. Originalmente para Champagne, hoy es la favorita de los bartenders modernos para cócteles clásicos.",
     capacidad: "120–180 ml",
@@ -94,7 +92,6 @@ const CRISTALERIA = [
     id: "highball",
     name: "Vaso Highball",
     emoji: "🥤",
-    photo: "https://images.unsplash.com/photo-1622758665277-05e973af4395?auto=format&fit=crop&w=600&q=80",
     aka: "Vaso largo",
     desc: "Vaso alto y estrecho. El más versátil de la coctelería. Diseñado para cócteles largos con mucho refresco sobre hielo.",
     capacidad: "240–350 ml",
@@ -106,7 +103,6 @@ const CRISTALERIA = [
     id: "old-fashioned",
     name: "Vaso Old Fashioned",
     emoji: "🥃",
-    photo: "https://images.unsplash.com/photo-1615887625746-f3d2aa27e048?auto=format&fit=crop&w=600&q=80",
     aka: "Rocks glass / Lowball",
     desc: "Vaso bajo y ancho. Sólido y elegante. El clásico para espirituosos puros y cócteles potentes con poco hielo o una bola de hielo grande.",
     capacidad: "180–300 ml",
@@ -118,7 +114,6 @@ const CRISTALERIA = [
     id: "flauta",
     name: "Flauta de Champagne",
     emoji: "🥂",
-    photo: "https://images.unsplash.com/photo-1546567075-d7113bee3c4a?auto=format&fit=crop&w=600&q=80",
     aka: "Champagne flute",
     desc: "Copa alta y estrecha que preserva las burbujas durante más tiempo. El cuello estrecho concentra los aromas y mantiene la efervescencia.",
     capacidad: "150–200 ml",
@@ -130,7 +125,6 @@ const CRISTALERIA = [
     id: "collins",
     name: "Vaso Collins",
     emoji: "🥤",
-    photo: "https://images.unsplash.com/photo-1630071073903-423f86c14389?auto=format&fit=crop&w=600&q=80",
     aka: "Tom Collins glass",
     desc: "Similar al Highball pero más alto y estrecho. Perfecto para cócteles muy largos con mucho hielo y refresco.",
     capacidad: "300–410 ml",
@@ -142,7 +136,6 @@ const CRISTALERIA = [
     id: "copa-vino",
     name: "Copa de Vino",
     emoji: "🍷",
-    photo: "https://images.unsplash.com/photo-1610065333275-b3e5c63fc872?auto=format&fit=crop&w=600&q=80",
     aka: "Wine glass",
     desc: "Copa amplia con tallo largo. En coctelería se usa principalmente para spritzes y cócteles con vino.",
     capacidad: "200–400 ml",
@@ -154,7 +147,6 @@ const CRISTALERIA = [
     id: "shot",
     name: "Chupito / Shot",
     emoji: "🥃",
-    photo: "https://images.unsplash.com/photo-1707340726386-611f5e9398f3?auto=format&fit=crop&w=600&q=80",
     aka: "Shot glass",
     desc: "Vaso pequeño para una sola toma. En coctelería profesional también se usa como medidor.",
     capacidad: "30–60 ml",
@@ -166,7 +158,6 @@ const CRISTALERIA = [
     id: "copper-mug",
     name: "Taza de Cobre",
     emoji: "🍺",
-    photo: "https://images.unsplash.com/photo-1527628126150-086ff233b951?auto=format&fit=crop&w=600&q=80",
     aka: "Copper mug / Moscow Mule mug",
     desc: "Taza de cobre que mantiene el frío de forma excepcional. Icónica e inseparable del Moscow Mule. El cobre se enfría con el hielo y mantiene el cóctel helado.",
     capacidad: "350–500 ml",
@@ -178,7 +169,6 @@ const CRISTALERIA = [
     id: "poco-grande",
     name: "Vaso Poco Grande",
     emoji: "🍹",
-    photo: "https://images.unsplash.com/photo-1692296979815-ba89f3ada00c?auto=format&fit=crop&w=600&q=80",
     aka: "Hurricane glass",
     desc: "Vaso curvilíneo tipo hurricane o poco grande. Evoca bebidas tropicales y tiki culture. Su forma amplia permite decoraciones elaboradas.",
     capacidad: "350–500 ml",
@@ -500,7 +490,7 @@ export default function App({ user, profile: cloudProfile, onProfileUpdate, onSi
   // Admin
   const [editTarget, setEditTarget] = useState(null);
   const [showForm, setShowForm] = useState(false);
-  const [form, setForm] = useState({ name:"", ingredients:"", recipe:"", showMeasures:true, isPublic:false, method:"Shake", glass:"Cocktail", garnish:"", notes:"", photo:"", difficulty:"medium", time:"", pairing:"", noAlcohol:false });
+  const [form, setForm] = useState({ name:"", ingredients:"", recipe:"", showMeasures:true, isPublic:false, method:"Shake", glass:"Cocktail", garnish:"", notes:"", difficulty:"medium", time:"", pairing:"", noAlcohol:false });
   const [photoPreview, setPhotoPreview] = useState(null);
   const [delConfirm, setDelConfirm] = useState(null);
 
@@ -554,7 +544,7 @@ export default function App({ user, profile: cloudProfile, onProfileUpdate, onSi
   }, [ingInput, selected]);
 
   // Admin
-  const openAdd = () => { setEditTarget(null); setForm({name:"",ingredients:"",recipe:"",showMeasures:true,isPublic:false,method:"Shake",glass:"Cocktail",garnish:"",notes:"",photo:"",difficulty:"medium",time:"",pairing:"",noAlcohol:false}); setPhotoPreview(null); setShowForm(true); };
+  const openAdd = () => { setEditTarget(null); setForm({name:"",ingredients:"",recipe:"",showMeasures:true,isPublic:false,method:"Shake",glass:"Cocktail",garnish:"",notes:"",difficulty:"medium",time:"",pairing:"",noAlcohol:false}); setPhotoPreview(null); setShowForm(true); };
   const openEdit = (c) => { setEditTarget(c); setForm({name:c.name,ingredients:c.ingredients.join(", "),recipe:c.recipe||"",showMeasures:c.showMeasures!==false,isPublic:c.is_public||false,method:c.method||"Shake",glass:c.glass||"Cocktail",garnish:c.garnish||"",notes:c.notes||"",photo:c.photo||"",difficulty:c.difficulty||"medium",time:c.time||"",pairing:c.pairing||"",noAlcohol:c.no_alcohol||false}); setPhotoPreview(c.photo_url||null); setShowForm(true); };
   const saveForm = async () => {
     if(!form.name||!form.ingredients) return;
@@ -983,11 +973,8 @@ export default function App({ user, profile: cloudProfile, onProfileUpdate, onSi
           {CRISTALERIA.map(cr=>(
             <div key={cr.id} style={{...card(false),padding:0,overflow:"hidden",borderLeft:`3px solid ${T.purple}`}} onClick={()=>setCristalDetail(cr)}>
               <div style={{display:"flex",alignItems:"center",gap:0}}>
-                <div style={{width:80,height:80,flexShrink:0,overflow:"hidden",background:"#111"}}>
-                  {cr.photo
-                    ? <img src={cr.photo} alt={cr.name} style={{width:"100%",height:"100%",objectFit:"cover"}}/>
-                    : <div style={{width:"100%",height:"100%",display:"flex",alignItems:"center",justifyContent:"center",fontSize:32}}>{cr.emoji}</div>
-                  }
+                <div style={{width:76,height:76,flexShrink:0,background:`${T.purple}20`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:34}}>
+                  {cr.emoji}
                 </div>
                 <div style={{flex:1,padding:"12px 14px"}}>
                   <div style={{fontSize:15,fontWeight:800,marginBottom:2,color:T.isDark?"#ffffff":"#0a0820"}}>{cr.name}</div>
