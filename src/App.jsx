@@ -364,20 +364,29 @@ const card = (hi, border) => ({ background: hi ? "#13102a" : T.card, border:`1px
 const chip = (on, col) => ({
   background: on
     ? (col||T.purpleD)+"55"
-    : T.isDark ? "#1e1e3a" : "#e8e4f8",
-  border: `2px solid ${on ? (col||T.purpleL) : T.isDark ? "#3a3a60" : "#9a94cc"}`,
-  borderRadius: 20,
-  padding: "7px 16px",
-  color: on ? (col||T.purpleL) : T.isDark ? "#ffffff" : "#1a1535",
+    : T.isDark
+      ? "rgba(255,255,255,0.08)"
+      : "rgba(26,20,16,0.07)",
+  border: `1.5px solid ${on
+    ? (col||T.purpleL)
+    : T.isDark
+      ? "rgba(255,255,255,0.2)"
+      : "rgba(26,20,16,0.2)"}`,
+  borderRadius: 22,
+  padding: "8px 16px",
+  color: on
+    ? (col||T.purpleL)
+    : T.isDark ? "#f0eeff" : "#1a1410",
   fontSize: 13,
   cursor: "pointer",
-  fontWeight: on ? 700 : 600,
+  fontWeight: on ? 700 : 500,
   whiteSpace: "nowrap",
   transition: "all .15s",
+  letterSpacing: 0.2,
 });
-const btn = (p, danger) => ({ background:danger?"#1a0808":p?`linear-gradient(135deg,${T.purpleD},${T.purpleL})`:"#111120", border:danger?"1px solid #ff444433":p?"none":`1px solid ${T.border2}`, borderRadius:10, padding:"12px 20px", color:danger?T.red:p?"#fff":T.muted, fontSize:14, fontWeight:p||danger?700:400, cursor:"pointer", width:"100%", marginBottom:10 });
+const btn = (p, danger) => ({ background:danger?"#2a0808":p?`linear-gradient(135deg,${T.purpleD},${T.purpleL})`:T.isDark?"#1a1a35":"#f0ebe0", border:danger?"1px solid #ff444433":p?"none":`1.5px solid ${T.border2}`, borderRadius:10, padding:"12px 20px", color:danger?T.red:p?"#fff":T.text, fontSize:14, fontWeight:p||danger?700:500, cursor:"pointer", width:"100%", marginBottom:10 });
 const lbl = { fontSize:9, letterSpacing:2.5, color:T.muted, textTransform:"uppercase", marginBottom:8, display:"block", fontWeight:700 };
-const inp = { width:"100%", background:T.isDark?"#ffffff12":"#0d0b1e08", border:`1px solid ${T.border2}`, borderRadius:10, padding:"11px 14px", color:T.text, fontSize:14, outline:"none", boxSizing:"border-box", WebkitAppearance:"none" };
+const inp = { width:"100%", background:T.isDark?"rgba(255,255,255,0.07)":"rgba(0,0,0,0.04)", border:`1.5px solid ${T.border2}`, borderRadius:10, padding:"11px 14px", color:T.text, fontSize:14, outline:"none", boxSizing:"border-box", WebkitAppearance:"none" };
 const tag = (col) => ({ background:`${col}25`, color:col, borderRadius:20, padding:"2px 9px", fontSize:9, fontWeight:700, letterSpacing:.5 });
 const divider = { height:1, background:T.border, margin:"18px 0" };
 
@@ -958,14 +967,14 @@ export default function App({ user, profile: cloudProfile, onProfileUpdate, onSi
           <div style={{fontSize:20,fontWeight:900,marginBottom:4}}>Técnicas de barra</div>
           <div style={{fontSize:13,color:T.muted,marginBottom:20}}>Las bases que todo bartender debe dominar.</div>
           {TECNICAS.map(t=>(
-            <div key={t.id} style={{...card(false),borderLeft:`3px solid ${t.color}`}} onClick={()=>setTechDetail(t)}>
+            <div key={t.id} style={{background:T.isDark?"#13132a":"#ffffff",border:`1px solid ${t.color}55`,borderLeft:`4px solid ${t.color}`,borderRadius:14,padding:"16px",marginBottom:10,cursor:"pointer"}} onClick={()=>setTechDetail(t)}>
               <div style={{display:"flex",alignItems:"center",gap:14}}>
-                <div style={{fontSize:30,flexShrink:0}}>{t.icon}</div>
+                <div style={{fontSize:32,flexShrink:0,background:`${t.color}22`,borderRadius:12,width:52,height:52,display:"flex",alignItems:"center",justifyContent:"center"}}>{t.icon}</div>
                 <div style={{flex:1}}>
-                  <div style={{fontSize:15,fontWeight:800,marginBottom:2}}>{t.name}</div>
-                  <div style={{fontSize:12,color:T.muted}}>{t.subtitle}</div>
+                  <div style={{fontSize:16,fontWeight:800,marginBottom:3,color:T.text}}>{t.name}</div>
+                  <div style={{fontSize:12,color:t.color,fontWeight:600}}>{t.subtitle}</div>
                 </div>
-                <span style={{color:T.dim,fontSize:18}}>›</span>
+                <span style={{color:T.muted,fontSize:20,fontWeight:700}}>›</span>
               </div>
             </div>
           ))}
@@ -1242,9 +1251,9 @@ export default function App({ user, profile: cloudProfile, onProfileUpdate, onSi
       )}
 
       {/* ─── NAV ─── */}
-      <div style={{position:"fixed",bottom:0,left:"50%",transform:"translateX(-50%)",width:"100%",maxWidth:480,background:T.isDark?"#0c0c1e":T.surface,borderTop:`1px solid ${T.border2}`,display:"flex",zIndex:20,backdropFilter:"blur(12px)"}}>
+      <div style={{position:"fixed",bottom:0,left:"50%",transform:"translateX(-50%)",width:"100%",maxWidth:480,background:T.isDark?"rgba(7,7,16,0.96)":"rgba(247,246,240,0.96)",borderTop:`1px solid ${T.border2}`,display:"flex",zIndex:20,backdropFilter:"blur(16px)",WebkitBackdropFilter:"blur(16px)"}}>
         {[["builder","🔍","Buscar"],["library","📖","Biblioteca"],["community","🌍","Comunidad"],["tecnicas","🍸","Técnicas"],["cristaleria","🥂","Copas"],["perfil","👤","Perfil"]].map(([t,icon,label])=>(
-          <button key={t} onClick={()=>setTab(t)} style={{flex:1,padding:"10px 2px 14px",background:"none",border:"none",borderTop:`2px solid ${tab===t?T.purpleL:"transparent"}`,color:tab===t?T.purpleL:"#2e2e50",fontSize:9,fontWeight:700,cursor:"pointer",letterSpacing:.5,textTransform:"uppercase",display:"flex",flexDirection:"column",alignItems:"center",gap:3}}>
+          <button key={t} onClick={()=>setTab(t)} style={{flex:1,padding:"10px 2px 14px",background:"none",border:"none",borderTop:`2px solid ${tab===t?T.purpleL:"transparent"}`,color:tab===t?T.purpleL:T.isDark?"#5050a0":"#9a9080",fontSize:9,fontWeight:700,cursor:"pointer",letterSpacing:.5,textTransform:"uppercase",display:"flex",flexDirection:"column",alignItems:"center",gap:3}}>
             <span style={{fontSize:20}}>{icon}</span>{label}
           </button>
         ))}
